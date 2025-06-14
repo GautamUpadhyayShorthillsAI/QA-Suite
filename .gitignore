@@ -1,2 +1,7 @@
 # Note: If you have different naming for venv file please add here
 /myenv
+.env
+*/__pycache__
+*/.pytest_cache
+/Playwright files
+/Test case files
