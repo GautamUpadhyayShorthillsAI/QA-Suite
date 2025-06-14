@@ -2,11 +2,6 @@ import streamlit as st
 from io import StringIO
 import os
 
-
-
-
-
-
 st.set_page_config(page_title="AI Automated QA Suite", layout="wide")
 
 st.title("🤖 AI Automated QA Suite")
