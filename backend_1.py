@@ -167,57 +167,101 @@ def page(browser):
 def run_script():
     data = request.get_json()
     script_content = data.get("script_content", "")
- 
+
+    # Validate script content
+    if not script_content.strip():
+        return jsonify({
+            "error": "Empty script",
+            "logs": [{
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "action": "Script validation",
+                "result": "Error"
+            }],
+            "stats": {"passed": 0, "failed": 0, "total": 0}
+        }), 400
+
     with tempfile.TemporaryDirectory() as temp_dir:
         script_path = os.path.join(temp_dir, "test_script.py")
         report_path = os.path.join(temp_dir, "report.json")
- 
+
         with open(script_path, "w") as f:
             f.write(script_content)
- 
+
         try:
-            # Run pytest with json reporting
             cmd = [
-                "pytest",
+                "pytest", 
                 script_path,
                 "--json-report",
                 f"--json-report-file={report_path}",
                 "--capture=no"
             ]
-            subprocess.run(cmd, check=False, cwd=temp_dir, capture_output=True, text=True)
- 
-            # Parse and format results for frontend
-            if not os.path.exists(report_path):
+            result = subprocess.run(cmd, check=False, cwd=temp_dir, capture_output=True, text=True)
+
+            # Handle execution errors
+            if result.returncode != 0:
+                error_logs = [{
+                    "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "action": line.strip(),
+                    "result": "Error"
+                } for line in result.stderr.split('\n') if line.strip()]
+                
+                if not error_logs:
+                    error_logs.append({
+                        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "action": "Unknown execution error",
+                        "result": "Error"
+                    })
+
                 return jsonify({
                     "error": "Test execution failed",
-                    "details": "No report generated - possible syntax error"
-                }), 400
- 
+                    "logs": error_logs,
+                    "stats": {"passed": 0, "failed": 0, "total": 0}
+                })
+
+            # Parse results
             with open(report_path) as f:
                 report = json.load(f)
- 
+
             logs = []
+            passed = failed = 0
             for test in report.get("tests", []):
-                logs.append({
+                outcome = test.get("outcome", "error")
+                result_details = {
                     "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "action": test.get("nodeid", "Unknown Test"),
-                    "result": test.get("outcome", "error").capitalize()
-                })
-                # Add individual test steps if available
-                for call in test.get("call", {}).get("trace", {}).get("steps", []):
-                    logs.append({
-                        "timestamp": datetime.datetime.fromtimestamp(call["start"]).strftime("%Y-%m-%d %H:%M:%S"),
-                        "action": call["name"],
-                        "result": "Pass" if call["status"] == "passed" else "Fail"
-                    })
- 
-            return jsonify({"logs": logs})
- 
+                    "result": outcome.capitalize(),
+                    "reason": "Test passed successfully."
+                }
+
+                if outcome == "passed":
+                    passed += 1
+                else:
+                    failed += 1
+                    # Extract failure reason from the 'longrepr' field if it exists
+                    result_details["reason"] = test.get("longrepr", "No failure reason available.")
+                
+                logs.append(result_details)
+
+            return jsonify({
+                "logs": logs,
+                "stats": {
+                    "passed": passed,
+                    "failed": failed,
+                    "total": passed + failed
+                }
+            })
+
         except Exception as e:
             return jsonify({
                 "error": "Test execution failed",
-                "details": str(e)
+                "logs": [{
+                    "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "action": str(e),
+                    "result": "Error"
+                }],
+                "stats": {"passed": 0, "failed": 0, "total": 0}
             }), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
