@@ -38,7 +38,6 @@ google-generativeai==0.5.4
 
 googleapis-common-protos==1.70.0
 
-greenlet==2.0.2
 
 grpcio==1.73.0
 
@@ -94,7 +93,7 @@ pandas==2.0.3
 
 Pillow==9.5.0
 
-playwright==1.36.0
+playwright>=1.40.0
 
 pluggy==1.6.0
 
@@ -114,7 +113,7 @@ pydantic_core==2.33.2
 
 pydeck==0.9.1
 
-pyee==9.0.4
+pyee>=11.0.1
 
 Pygments==2.19.1
 
@@ -149,6 +148,8 @@ rich==13.9.4
 rpds-py==0.25.1
 
 rsa==4.9.1
+
+setuptools>=80.0.0
 
 six==1.17.0
 
