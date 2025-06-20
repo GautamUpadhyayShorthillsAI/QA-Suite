@@ -1,9 +1,3 @@
-
-
-
-
-
-
 from flask import Flask, request, jsonify
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
@@ -38,7 +32,7 @@ def generate_test_ideas():
 
     prompt = f"""
 You are a QA expert. Based on this Playwright JS file and the '{functionality}' functionality, 
-generate exactly 10 test case titles in this STRICT JSON format in case there are more than 10 test cases for a particular functionality. 
+generate exactly 20 test case titles in this STRICT JSON format in case there are more than 20 test cases for a particular functionality. 
 If the user explicitly asks for a specific number of test cases for a particular functionality, then only generate that number of test cases:
 Also finally as an example if a user specifies a particular functionality like form filling and validation , then only generate test cases for that functionality and keep the flow till that functionality same as the JS file 
 For eg: If i have asked you to test a particular form filling , but that form appears after Login , then till we reach that form or any other functionality on the website just go with the flow of the JS file and stop at that functionality and test that functionality with the required test cases 
@@ -81,7 +75,7 @@ Return ONLY the JSON object with the test_ideas array. No other text or explanat
         if(len(test_ideas) < 20):
             return jsonify({"test_ideas":test_ideas})
         else:
-            return jsonify({"test_ideas": test_ideas[:10]})  # Ensure exactly 20
+            return jsonify({"test_ideas": test_ideas[:20]})  # Ensure exactly 20
     except Exception as e:
         return jsonify({"error": f"Failed to parse test ideas: {str(e)}"}), 500
 
@@ -126,7 +120,7 @@ def page(browser):
   - If the JS file shows navigation, check that the URL has changed (but do not hardcode a new URL).
 
 - For NEGATIVE test cases (e.g., submitting an invalid form, missing required fields):
-  - First, check if the submit/next/login button is disabled when required fields are empty or invalid. If so, assert that the button is disabled and do not attempt to click it.
+#   - First, check if the submit/next/login button is disabled when required fields are empty or invalid. If so, assert that the button is disabled and do not attempt to click it.
   - If the button is enabled and clicked, check that the URL does not change (i.e., the user is not navigated away).indicating that the fields are incorrect and the user is not able to proceed to the next page.
   - Don't assumes which URL's will appear try to check the URL's currently  if you are using it as check for the fields being incorrect and the user is not able to proceed to the next page.
   - Only check for error messages if a specific selector or class is provided (e.g., '.text-destructive'). Never invent error text or popups.
@@ -169,106 +163,61 @@ def page(browser):
         return jsonify({"script": script})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 @app.route("/run_script", methods=["POST"])
 def run_script():
     data = request.get_json()
     script_content = data.get("script_content", "")
-
-    # Validate script content
-    if not script_content.strip():
-        return jsonify({
-            "error": "Empty script",
-            "logs": [{
-                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "action": "Script validation",
-                "result": "Error"
-            }],
-            "stats": {"passed": 0, "failed": 0, "total": 0}
-        }), 400
-
+ 
     with tempfile.TemporaryDirectory() as temp_dir:
         script_path = os.path.join(temp_dir, "test_script.py")
         report_path = os.path.join(temp_dir, "report.json")
-
+ 
         with open(script_path, "w") as f:
             f.write(script_content)
-
+ 
         try:
+            # Run pytest with json reporting
             cmd = [
-                "pytest", 
+                "pytest",
                 script_path,
                 "--json-report",
                 f"--json-report-file={report_path}",
                 "--capture=no"
             ]
-            result = subprocess.run(cmd, check=False, cwd=temp_dir, capture_output=True, text=True)
-
-            # Handle execution errors
-            if result.returncode != 0:
-                error_logs = [{
-                    "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "action": line.strip(),
-                    "result": "Error"
-                } for line in result.stderr.split('\n') if line.strip()]
-                
-                if not error_logs:
-                    error_logs.append({
-                        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        "action": "Unknown execution error",
-                        "result": "Error"
-                    })
-
+            subprocess.run(cmd, check=False, cwd=temp_dir, capture_output=True, text=True)
+ 
+            # Parse and format results for frontend
+            if not os.path.exists(report_path):
                 return jsonify({
                     "error": "Test execution failed",
-                    "logs": error_logs,
-                    "stats": {"passed": 0, "failed": 0, "total": 0}
-                })
-
-            # Parse results
+                    "details": "No report generated - possible syntax error"
+                }), 400
+ 
             with open(report_path) as f:
                 report = json.load(f)
-
+ 
             logs = []
-            passed = failed = 0
             for test in report.get("tests", []):
-                outcome = test.get("outcome", "error")
-                result_details = {
+                logs.append({
                     "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "action": test.get("nodeid", "Unknown Test"),
-                    "result": outcome.capitalize(),
-                    "reason": "Test passed successfully."
-                }
-
-                if outcome == "passed":
-                    passed += 1
-                else:
-                    failed += 1
-                    # Extract failure reason from the 'longrepr' field if it exists
-                    result_details["reason"] = test.get("longrepr", "No failure reason available.")
-                
-                logs.append(result_details)
-
-            return jsonify({
-                "logs": logs,
-                "stats": {
-                    "passed": passed,
-                    "failed": failed,
-                    "total": passed + failed
-                }
-            })
-
+                    "result": test.get("outcome", "error").capitalize()
+                })
+                # Add individual test steps if available
+                for call in test.get("call", {}).get("trace", {}).get("steps", []):
+                    logs.append({
+                        "timestamp": datetime.datetime.fromtimestamp(call["start"]).strftime("%Y-%m-%d %H:%M:%S"),
+                        "action": call["name"],
+                        "result": "Pass" if call["status"] == "passed" else "Fail"
+                    })
+ 
+            return jsonify({"logs": logs})
+ 
         except Exception as e:
             return jsonify({
                 "error": "Test execution failed",
-                "logs": [{
-                    "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "action": str(e),
-                    "result": "Error"
-                }],
-                "stats": {"passed": 0, "failed": 0, "total": 0}
+                "details": str(e)
             }), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
