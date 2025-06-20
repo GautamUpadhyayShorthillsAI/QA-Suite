@@ -1,5 +1,9 @@
-# Note: If you have different naming for venv file please add here
-/myenv
-/Playwright files
-/Test case files
-
+*/__pycache__
+*/.pytest_cache
+*/.env
+*/.venv
+*/.vscode
+*/.idea
+*/.DS_Store
+*/.gitignore
+*/.gitignore
