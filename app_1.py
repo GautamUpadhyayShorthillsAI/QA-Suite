@@ -23,6 +23,14 @@ with st.sidebar:
     """)
     st.info("Follow the steps to generate and run your automated QA tests.")
 
+    st.markdown("---")
+    st.subheader("💡 Prompting Guide")
+    st.markdown("""
+    • **Test a single functionality** – type its name (e.g., `Login`, `Search`, `Checkout`).\n 
+    • **Test the *whole* web-flow** – enter **`whole flow`** or leave the functionality blank. You will receive incremental test ideas for every section (e.g., *Login only*, *Login → Form-1*, etc.)\n.
+    • **Run the recorded JS exactly once** – enter **`verbatim flow`** / **`sanity`** / **`convert`** to get a single pytest that mirrors the JS events step-by-step.
+    """)
+
 # Backend endpoints
 BACKEND_URL = "http://localhost:5000"
 
