@@ -2,6 +2,8 @@
 /myenv
 .env
 */__pycache__
-*/.pytest_cache
+/.pytest_cache
 /Playwright files
 /Test case files
+/flows
+/utils
