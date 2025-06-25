@@ -1,0 +1,33 @@
+2025-06-20 16:35:45 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-20 16:35:45 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-20 16:35:45 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-20 16:36:19 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-20 16:36:19 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "login n form flow", "js_content_length": 3054, "has_js_content": true}
+2025-06-20 16:36:19 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-20 16:36:32 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1920, "llm_duration": 12.717103242874146}
+2025-06-20 16:36:32 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful login with valid credentials.", "Test login attempt with empty username field and observe button state/navigation.", "Test login attempt with empty password field and observe button state/navigation."]}
+2025-06-20 16:36:32 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 12.72s | Context: {"test_ideas_count": 20}
+2025-06-20 16:37:28 | INFO     | Backend | info:76 | Received script generation request
+2025-06-20 16:37:28 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "n", "selected_tests_count": 20, "js_content_length": 3054, "selected_tests_preview": ["Verify successful login with valid credentials.", "Test login attempt with empty username field and observe button state/navigation.", "Test login attempt with empty password field and observe button state/navigation."]}
+2025-06-20 16:37:28 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-20 16:38:36 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 19460, "llm_duration": 67.9536771774292}
+2025-06-20 16:38:36 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 19446, "has_fixtures": true, "has_imports": true}
+2025-06-20 16:38:36 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 67.96s | Context: {"script_length": 19446, "tests_count": 20}
+2025-06-20 16:38:45 | INFO     | Backend | info:76 | Received script execution request
+2025-06-20 16:38:45 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 19446, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n# IMPORTS (must include exactly)\n# import pytest\n# import re\n# from playwright.sync_api i"}
+2025-06-20 16:38:45 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmplia5qkt1", "script_path": "/tmp/tmplia5qkt1/test_script.py", "report_path": "/tmp/tmplia5qkt1/report.json"}
+2025-06-20 16:38:45 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmplia5qkt1/test_script.py | Status: SUCCESS | Context: {"content_length": 19446}
+2025-06-20 16:38:45 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmplia5qkt1/test_script.py --json-report --json-report-file=/tmp/tmplia5qkt1/report.json --capture=no", "working_dir": "/tmp/tmplia5qkt1"}
+2025-06-20 16:38:46 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 2, "execution_duration": 0.9991497993469238, "stdout_length": 2643, "stderr_length": 0}
+2025-06-20 16:38:46 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmplia5qkt1/report.json | Status: SUCCESS
+2025-06-20 16:38:46 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0, "logs_count": 0}
+2025-06-20 16:38:46 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 1.01s | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0}
+2025-06-20 16:39:49 | INFO     | Backend | info:76 | Received script execution request
+2025-06-20 16:39:49 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 19446, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n# IMPORTS (must include exactly)\n# import pytest\n# import re\n# from playwright.sync_api i"}
+2025-06-20 16:39:49 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmps2lm2fvt", "script_path": "/tmp/tmps2lm2fvt/test_script.py", "report_path": "/tmp/tmps2lm2fvt/report.json"}
+2025-06-20 16:39:49 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmps2lm2fvt/test_script.py | Status: SUCCESS | Context: {"content_length": 19446}
+2025-06-20 16:39:49 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmps2lm2fvt/test_script.py --json-report --json-report-file=/tmp/tmps2lm2fvt/report.json --capture=no", "working_dir": "/tmp/tmps2lm2fvt"}
+2025-06-20 16:39:50 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 2, "execution_duration": 0.9262137413024902, "stdout_length": 2643, "stderr_length": 0}
+2025-06-20 16:39:50 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmps2lm2fvt/report.json | Status: SUCCESS
+2025-06-20 16:39:50 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0, "logs_count": 0}
+2025-06-20 16:39:50 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 0.93s | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0}

@@ -1,0 +1,10 @@
+2025-06-24 00:32:20 | INFO     | Backend | info:76 | Starting QA-Suite Backend with Dynamic Self-Healing Engine | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-24 00:32:20 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.1, "api_key_configured": true}
+2025-06-24 00:32:20 | INFO     | Backend | info:76 | Starting Flask development server with Dynamic Self-Healing Engine | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-24 00:32:47 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 00:33:00 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-24 00:33:32 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 00:33:32 | INFO     | Backend | info:76 | Starting execution attempt 1/4
+2025-06-24 00:33:32 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 00:34:23 | WARNING  | Backend | warning:88 | Script failed on attempt 1. Analyzing for self-healing.
+2025-06-24 00:34:23 | ERROR    | Backend | error:94 | Could not parse failing command. Aborting self-heal.

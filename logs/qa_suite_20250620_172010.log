@@ -1,0 +1,5 @@
+2025-06-20 17:20:10 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-20 17:20:10 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "recorderjson.js", "file_size": 2338, "content_length": 2338}
+2025-06-20 17:20:10 | INFO     | Frontend | info:76 | Making API call to generate script | Context: {"website_url": "123", "selected_tests_count": 20, "js_content_length": 2338}
+2025-06-20 17:20:58 | INFO     | Frontend | info:76 | Script generated successfully | Context: {"script_length": 13291, "response_time": 47.367971420288086}
+2025-06-20 17:20:58 | INFO     | Frontend | info:76 | Script generated and step advanced | Context: {"selected_tests_count": 20, "script_length": 13291}

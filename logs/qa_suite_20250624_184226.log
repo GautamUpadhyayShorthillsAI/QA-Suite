@@ -1,0 +1,12 @@
+2025-06-24 18:42:26 | INFO     | Backend | info:76 | Starting QA-Suite Backend with Dynamic Self-Healing Engine | Context: {"python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-24 18:42:26 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.1, "api_key_configured": true}
+2025-06-24 18:42:26 | INFO     | Backend | info:76 | Starting Flask development server with Dynamic Self-Healing Engine | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-24 18:43:17 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 18:44:41 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-24 18:45:06 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 18:45:06 | INFO     | Backend | info:76 | Starting execution attempt 1/5
+2025-06-24 18:45:06 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 18:46:54 | WARNING  | Backend | warning:88 | Script failed on attempt 1. Analyzing for self-healing.
+2025-06-24 18:46:54 | INFO     | Backend | info:76 | Manual retry 1/1 failed. Waiting 10.0s before next attempt.
+2025-06-24 18:47:04 | INFO     | Backend | info:76 | Starting execution attempt 2/5
+2025-06-24 18:47:04 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.

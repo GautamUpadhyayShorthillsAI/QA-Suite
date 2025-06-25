@@ -1,0 +1,4 @@
+2025-06-23 22:06:07 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 22:06:07 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jump_full_flow.js", "file_size": 10540, "content_length": 10540}
+2025-06-23 22:06:07 | INFO     | Frontend | info:76 | Making API call to generate a full flow script | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login", "js_content_length": 10540}
+2025-06-23 22:06:07 | ERROR    | Frontend | error:94 | Failed to generate full flow script | Context: {"status_code": 404, "response_text": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"}

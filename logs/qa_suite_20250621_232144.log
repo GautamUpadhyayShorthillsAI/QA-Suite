@@ -1,0 +1,44 @@
+2025-06-21 23:21:44 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-21 23:21:44 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-21 23:21:44 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-21 23:22:11 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-21 23:22:11 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Check functionality (sanity) for login and form 1", "js_content_length": 3054, "has_js_content": true}
+2025-06-21 23:22:11 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-21 23:22:25 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 2121, "llm_duration": 14.356609344482422}
+2025-06-21 23:22:25 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful navigation to the login page URL.", "Test successful login with valid username and password.", "Verify 'New Chat' button is clickable if it appears after successful login."]}
+2025-06-21 23:22:25 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 14.36s | Context: {"test_ideas_count": 20}
+2025-06-21 23:22:29 | INFO     | Backend | info:76 | Received script generation request
+2025-06-21 23:22:29 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "12", "selected_tests_count": 20, "js_content_length": 3054, "selected_tests_preview": ["Verify successful navigation to the login page URL.", "Test successful login with valid username and password.", "Verify 'New Chat' button is clickable if it appears after successful login."]}
+2025-06-21 23:22:29 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-21 23:23:47 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 17090, "llm_duration": 78.36195707321167}
+2025-06-21 23:23:47 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 17076, "has_fixtures": true, "has_imports": true}
+2025-06-21 23:23:47 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 78.36s | Context: {"script_length": 17076, "tests_count": 20}
+2025-06-21 23:23:55 | INFO     | Backend | info:76 | Received script execution request
+2025-06-21 23:23:55 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 17076, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n# FIXTURES (must include exactly)\n@pytest.fixture(scope=\"session\")\ndef browser():\n    wit"}
+2025-06-21 23:23:55 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmps3u2ui7p", "script_path": "/tmp/tmps3u2ui7p/test_script.py", "report_path": "/tmp/tmps3u2ui7p/report.json"}
+2025-06-21 23:23:55 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmps3u2ui7p/test_script.py | Status: SUCCESS | Context: {"content_length": 17076}
+2025-06-21 23:23:55 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmps3u2ui7p/test_script.py --json-report --json-report-file=/tmp/tmps3u2ui7p/report.json --capture=no -v --tb=long --log-file=/tmp/tmps3u2ui7p/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmps3u2ui7p"}
+2025-06-21 23:29:27 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 331.07660150527954, "stdout_length": 42585, "stderr_length": 0}
+2025-06-21 23:29:27 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmps3u2ui7p/report.json | Status: SUCCESS
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_successful_navigation_to_login_page_url | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_login_with_valid_username_and_password | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_new_chat_button_is_clickable_if_it_appears_after_successful_login | Result: skipped
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_attempt_with_empty_username_field | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_attempt_with_empty_password_field | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_attempt_with_both_username_and_password_fields_empty | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_navigation_to_patient_demographics_form_after_successful_login | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_filling_all_required_and_optional_fields_in_form1_and_proceeding | Result: failed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_submitting_form1_with_first_name_field_empty | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_submitting_form1_with_last_name_field_empty | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_submitting_form1_with_dob_field_empty | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_submitting_form1_without_selecting_gender | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_submitting_form1_without_filling_age | Result: failed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_filling_dob_with_invalid_format_in_form1 | Result: passed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_navigation_to_medical_history_form_after_successful_submission_of_patient_demographics | Result: failed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_selecting_multiple_medical_history_conditions | Result: failed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_proceeding_from_medical_history_form_without_selecting_any_conditions | Result: failed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_clicking_save_and_continue_button_to_complete_medical_history_section | Result: failed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_successful_logout_by_clicking_logout_and_confirm_buttons | Result: failed
+2025-06-21 23:29:27 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_navigation_back_to_the_login_page_after_successful_logout | Result: failed
+2025-06-21 23:29:27 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 20, "passed_tests": 11, "failed_tests": 9, "logs_count": 20, "detailed_failures_count": 9}
+2025-06-21 23:29:27 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 331.09s | Context: {"total_tests": 20, "passed_tests": 11, "failed_tests": 9}

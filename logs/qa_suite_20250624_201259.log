@@ -1,0 +1,12 @@
+2025-06-24 20:12:59 | INFO     | Backend | info:76 | Starting QA-Suite Backend with Dynamic Self-Healing Engine | Context: {"python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-24 20:12:59 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.1, "api_key_configured": true}
+2025-06-24 20:12:59 | INFO     | Backend | info:76 | Starting Flask development server with Dynamic Self-Healing Engine | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-24 20:13:56 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 20:14:11 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-24 20:14:42 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 20:14:42 | INFO     | Backend | info:76 | Starting execution attempt 1/7
+2025-06-24 20:14:42 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 20:18:58 | INFO     | Backend | info:76 | Script executed successfully on attempt 1.
+2025-06-24 22:31:48 | INFO     | Backend | info:76 | Received script generation request
+2025-06-24 22:51:53 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 22:55:32 | INFO     | Backend | info:76 | Received test ideas generation request

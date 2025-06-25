@@ -1,0 +1,6 @@
+2025-06-20 17:44:24 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-20 17:44:24 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnectRecord.js", "file_size": 7298, "content_length": 7298}
+2025-06-20 17:44:24 | INFO     | Frontend | info:76 | Making API call to run script | Context: {"script_length": 18889}
+2025-06-20 17:49:27 | INFO     | Frontend | info:76 | Script executed successfully | Context: {"response_time": 303.2859969139099, "has_logs": true, "logs_count": 17}
+2025-06-20 17:49:27 | INFO     | Frontend | info:76 | Script execution completed successfully | Context: {"logs_count": 17, "stats": {"failed": 13, "passed": 4, "total": 17}}
+2025-06-20 17:49:27 | INFO     | Frontend | info:76 | User completed all workflow steps | Context: {"final_step": 6, "total_steps": 7}

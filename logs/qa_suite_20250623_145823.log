@@ -1,0 +1,4 @@
+2025-06-23 14:58:23 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 14:58:23 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "orange.js", "file_size": 4411, "content_length": 4410}
+2025-06-23 14:58:23 | INFO     | Frontend | info:76 | Making API call to generate a full flow script | Context: {"website_url": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login", "js_content_length": 4410}
+2025-06-23 14:58:23 | ERROR    | Frontend | error:94 | Failed to generate full flow script | Context: {"status_code": 404, "response_text": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"}

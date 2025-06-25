@@ -1,0 +1,2 @@
+2025-06-25 10:14:54 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]"}
+2025-06-25 10:14:54 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "digitree_full.js", "file_size": 4046, "content_length": 4046}

@@ -1,0 +1,4 @@
+2025-06-22 16:07:01 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-22 16:07:01 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnect 2 copy.js", "file_size": 4672, "content_length": 4672}
+2025-06-22 16:07:01 | INFO     | Frontend | info:76 | Making API call to generate script | Context: {"website_url": "https://geneconnectdoctor.shorthills.ai/login", "selected_tests_count": 19, "js_content_length": 4672}
+2025-06-22 16:07:59 | ERROR    | Frontend | error:94 | Failed to generate script | Context: {"status_code": 500, "response_text": "{\n  \"error\": \"Enhanced script syntax validation failed: ['Syntax error at line 11: expected an indented block after function definition on line 9']\"\n}\n"}

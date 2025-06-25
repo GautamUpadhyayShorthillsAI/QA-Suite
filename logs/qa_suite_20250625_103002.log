@@ -1,0 +1,6 @@
+2025-06-25 10:30:02 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]"}
+2025-06-25 10:30:02 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnectCompFlow.js", "file_size": 3790, "content_length": 3790}
+2025-06-25 10:30:02 | INFO     | Frontend | info:76 | Making API call to generate script | Context: {"website_url": "https://geneconnectdoctor.shorthills.ai/login", "selected_tests_count": 20, "js_content_length": 3790}
+2025-06-25 10:30:44 | INFO     | Frontend | info:76 | Script generated successfully | Context: {"script_length": 10510, "response_time": 42.72805404663086}
+2025-06-25 10:30:44 | INFO     | Frontend | info:76 | Script generated and step advanced | Context: {"selected_tests_count": 20, "script_length": 10510}
+2025-06-25 10:30:44 | INFO     | Frontend | info:76 | User completed all workflow steps | Context: {"final_step": 6, "total_steps": 7}

@@ -1,0 +1,6 @@
+2025-06-24 10:58:10 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-24 10:58:10 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jump_full_flow.js", "file_size": 10556, "content_length": 10556}
+2025-06-24 10:58:10 | INFO     | Frontend | info:76 | Making API call to run script | Context: {"script_length": 10789}
+2025-06-24 11:01:49 | ERROR    | Frontend | error:94 | Exception during script execution | Context: {"error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))", "error_type": "ConnectionError"}
+2025-06-24 11:01:49 | ERROR    | Frontend | error:94 | Script execution returned error | Context: {"error": "Failed to run script", "has_logs": true}
+2025-06-24 11:01:49 | INFO     | Frontend | info:76 | User completed all workflow steps | Context: {"final_step": 6, "total_steps": 7}

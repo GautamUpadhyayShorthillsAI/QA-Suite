@@ -1,0 +1,5 @@
+2025-06-20 17:19:53 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-20 17:19:53 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "recorderjson.js", "file_size": 2338, "content_length": 2338}
+2025-06-20 17:19:53 | INFO     | Frontend | info:76 | Making API call to generate test ideas | Context: {"functionality": "Use the creds and functionality in JS file to make a sanity check flow", "js_content_length": 2338}
+2025-06-20 17:20:06 | INFO     | Frontend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "response_time": 13.142672538757324}
+2025-06-20 17:20:06 | INFO     | Frontend | info:76 | Test ideas generated and step advanced | Context: {"functionality": "Use the creds and functionality in JS file to make a sanity check flow", "test_ideas_count": 20}

@@ -1,0 +1,20 @@
+2025-06-22 16:05:42 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-22 16:05:42 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-22 16:05:42 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-22 16:05:42 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-22 16:05:42 | INFO     | Frontend | info:76 | Initialized session state | Context: {"current_step": 0}
+2025-06-22 16:06:15 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-22 16:06:15 | INFO     | Backend | info:76 | Processing test ideas generation request | Context: {"functionality": "Generate Test cases for Login and Form 1", "js_content_length": 4672, "has_js_content": true, "website_url": ""}
+2025-06-22 16:06:15 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-22 16:06:31 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 2477, "llm_duration": 16.326154947280884}
+2025-06-22 16:06:31 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Sanity: User can successfully log in with valid credentials and navigate to the dashboard.", "Sanity: Login page loads correctly displaying username, password fields, and submit button.", "Edge Case: Login fails and user remains on the login page when attempting to log in with an invalid username and valid password."]}
+2025-06-22 16:06:31 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 16.33s | Context: {"test_ideas_count": 20}
+2025-06-22 16:07:01 | INFO     | Backend | info:76 | Received script generation request
+2025-06-22 16:07:01 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://geneconnectdoctor.shorthills.ai/login", "selected_tests_count": 19, "js_content_length": 4672, "selected_tests_preview": ["Sanity: User can successfully log in with valid credentials and navigate to the dashboard.", "Sanity: Login page loads correctly displaying username, password fields, and submit button.", "Edge Case: Login fails and user remains on the login page when attempting to log in with an invalid username and valid password."], "functionality": ""}
+2025-06-22 16:07:01 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-22 16:07:59 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 35765, "llm_duration": 58.56295895576477}
+2025-06-22 16:07:59 | INFO     | Backend | info:76 | Script validation completed | Context: {"is_valid": true, "coverage_score": 66.66666666666666, "edge_case_coverage": 87.5, "error_handling_score": 60.0, "warnings_count": 0, "errors_count": 0, "suggestions_count": 0}
+2025-06-22 16:07:59 | INFO     | Backend | info:76 | Script enhanced with intelligent features
+2025-06-22 16:07:59 | ERROR    | Backend | error:94 | Script syntax validation failed: Syntax error at line 11: expected an indented block after function definition on line 9
+2025-06-22 16:07:59 | ERROR    | Backend | error:94 | Enhanced script has syntax errors | Context: {"errors": ["Syntax error at line 11: expected an indented block after function definition on line 9"]}
+2025-06-22 16:07:59 | ERROR    | Backend | error:94 | Error in generate_script | Context: {"error": "Enhanced script syntax validation failed: ['Syntax error at line 11: expected an indented block after function definition on line 9']", "error_type": "ValueError"}

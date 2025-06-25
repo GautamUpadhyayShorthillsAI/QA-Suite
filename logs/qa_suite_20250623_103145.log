@@ -1,0 +1,6 @@
+2025-06-23 10:31:45 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 10:31:45 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jumpIQ_basic.js", "file_size": 2413, "content_length": 2413}
+2025-06-23 10:31:45 | INFO     | Frontend | info:76 | Making API call to run script | Context: {"script_length": 17294}
+2025-06-23 10:34:18 | INFO     | Frontend | info:76 | Script executed successfully | Context: {"response_time": 153.50904250144958, "has_logs": true, "logs_count": 16}
+2025-06-23 10:34:18 | INFO     | Frontend | info:76 | Script execution completed successfully | Context: {"logs_count": 16, "stats": {"failed": 6, "passed": 10, "success_rate": "62.5%", "total": 16}}
+2025-06-23 10:34:18 | INFO     | Frontend | info:76 | User completed all workflow steps | Context: {"final_step": 6, "total_steps": 7}

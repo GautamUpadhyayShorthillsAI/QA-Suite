@@ -1,0 +1,42 @@
+2025-06-22 23:26:55 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-22 23:26:55 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-22 23:26:55 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-22 23:28:02 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-22 23:28:02 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Generate Test Cases for Login and Form 1", "js_content_length": 4672, "has_js_content": true}
+2025-06-22 23:28:02 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-22 23:28:13 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1563, "llm_duration": 10.721370220184326}
+2025-06-22 23:28:13 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful login with valid credentials.", "Verify redirection to dashboard after successful login.", "Verify login button state when username field is empty."]}
+2025-06-22 23:28:13 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 10.73s | Context: {"test_ideas_count": 20}
+2025-06-22 23:28:25 | INFO     | Backend | info:76 | Received script generation request
+2025-06-22 23:28:25 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://geneconnectdoctor.shorthills.ai/login", "selected_tests_count": 20, "js_content_length": 4672, "selected_tests_preview": ["Verify successful login with valid credentials.", "Verify redirection to dashboard after successful login.", "Verify login button state when username field is empty."]}
+2025-06-22 23:28:25 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-22 23:29:34 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 16180, "llm_duration": 68.99449586868286}
+2025-06-22 23:29:34 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 16166, "has_fixtures": true, "has_imports": true}
+2025-06-22 23:29:34 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 69.00s | Context: {"script_length": 16166, "tests_count": 20}
+2025-06-22 23:29:39 | INFO     | Backend | info:76 | Received script execution request
+2025-06-22 23:29:39 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 16166, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n# IMPORTS (must include exactly):\n# import pytest\n# import re\n# from playwright.sync_api "}
+2025-06-22 23:29:39 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpvkwuz3eh", "script_path": "/tmp/tmpvkwuz3eh/test_script.py", "report_path": "/tmp/tmpvkwuz3eh/report.json"}
+2025-06-22 23:29:39 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpvkwuz3eh/test_script.py | Status: SUCCESS | Context: {"content_length": 16166}
+2025-06-22 23:29:39 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpvkwuz3eh/test_script.py --json-report --json-report-file=/tmp/tmpvkwuz3eh/report.json --capture=no -v --tb=long --log-file=/tmp/tmpvkwuz3eh/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmpvkwuz3eh"}
+2025-06-22 23:30:11 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 32.01728940010071, "stdout_length": 21638, "stderr_length": 0}
+2025-06-22 23:30:11 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmpvkwuz3eh/report.json | Status: SUCCESS
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_successful_login_and_redirection | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_login_button_state_username_empty | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_login_button_state_password_empty | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_login_button_state_both_empty | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_initial_login_page_elements_displayed | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_new_chat_button_handled_correctly_post_login | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_successful_form1_submission_and_navigation_to_form2 | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_first_name_field_accepts_alphanumeric | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_last_name_field_accepts_alphanumeric | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_dob_field_accepts_mm_dd_yyyy_format | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_age_field_auto_populates_correctly | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_gender_radio_buttons_can_be_selected | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_adoption_status_radio_buttons_can_be_selected | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_form1_submission_button_state_first_name_empty | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_form1_submission_button_state_last_name_empty | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_form1_submission_button_state_dob_empty | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_form1_submission_button_state_gender_not_selected | Result: failed
+2025-06-22 23:30:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_form1_submission_button_state_adoption_status_not_selected | Result: failed
+2025-06-22 23:30:11 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 18, "passed_tests": 0, "failed_tests": 18, "logs_count": 18, "detailed_failures_count": 18}
+2025-06-22 23:30:11 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 32.02s | Context: {"total_tests": 18, "passed_tests": 0, "failed_tests": 18}

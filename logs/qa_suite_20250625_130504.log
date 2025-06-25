@@ -1,0 +1,2 @@
+2025-06-25 13:05:04 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]"}
+2025-06-25 13:05:04 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jump_full_flow.js", "file_size": 10432, "content_length": 10432}

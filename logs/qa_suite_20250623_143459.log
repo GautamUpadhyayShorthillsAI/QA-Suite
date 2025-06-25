@@ -1,0 +1,6 @@
+2025-06-23 14:34:59 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-23 14:34:59 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-23 14:34:59 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-23 14:35:00 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 14:35:00 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Test cases for full flow", "js_content_length": 10540, "has_js_content": true}
+2025-06-23 14:35:00 | INFO     | Backend | info:76 | Calling LLM for test ideas generation

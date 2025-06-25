@@ -1,0 +1,9 @@
+2025-06-25 14:10:09 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]"}
+2025-06-25 14:10:09 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jump_full_flow.js", "file_size": 10432, "content_length": 10432}
+2025-06-25 14:10:09 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]"}
+2025-06-25 14:10:09 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jump_full_flow.js", "file_size": 10432, "content_length": 10432}
+2025-06-25 14:10:09 | INFO     | Frontend | info:76 | Making API call to generate test ideas | Context: {"functionality": "Login flow", "js_content_length": 10432}
+2025-06-25 14:10:16 | INFO     | Frontend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "response_time": 6.373321294784546}
+2025-06-25 14:10:16 | INFO     | Frontend | info:76 | Test ideas generated and step advanced | Context: {"functionality": "Login flow", "test_ideas_count": 20}
+2025-06-25 14:10:49 | INFO     | Frontend | info:76 | Script generated successfully | Context: {"script_length": 34402, "response_time": 2403.82075214386}
+2025-06-25 14:11:30 | INFO     | Frontend | info:76 | Script generated successfully | Context: {"script_length": 35485, "response_time": 2395.4016489982605}

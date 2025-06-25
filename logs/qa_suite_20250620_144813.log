@@ -1,0 +1,23 @@
+2025-06-20 14:48:13 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-20 14:48:13 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-20 14:48:13 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-20 14:49:10 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-20 14:49:10 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Login and Form shall be tested", "js_content_length": 3054, "has_js_content": true}
+2025-06-20 14:49:10 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-20 14:49:29 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1864, "llm_duration": 19.15833020210266}
+2025-06-20 14:49:29 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful login with valid username and password.", "Test login with incorrect username, verify no navigation to dashboard.", "Test login with incorrect password, verify no navigation to dashboard."]}
+2025-06-20 14:49:29 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 19.17s | Context: {"test_ideas_count": 20}
+2025-06-20 14:49:32 | INFO     | Backend | info:76 | Received script generation request
+2025-06-20 14:49:32 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "xy", "selected_tests_count": 20, "js_content_length": 3054, "selected_tests_preview": ["Verify successful login with valid username and password.", "Test login with incorrect username, verify no navigation to dashboard.", "Test login with incorrect password, verify no navigation to dashboard."]}
+2025-06-20 14:49:32 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-20 14:50:35 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 21669, "llm_duration": 62.440582275390625}
+2025-06-20 14:50:35 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 21654, "has_fixtures": true, "has_imports": true}
+2025-06-20 14:50:35 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 62.44s | Context: {"script_length": 21654, "tests_count": 20}
+2025-06-20 14:50:48 | INFO     | Backend | info:76 | Received script execution request
+2025-06-20 14:50:48 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 21654, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n# FIXTURES (must include exactly as provided)\n@pytest.fixture(scope=\"session\")\ndef browse"}
+2025-06-20 14:50:48 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmphlk6cjfd", "script_path": "/tmp/tmphlk6cjfd/test_script.py", "report_path": "/tmp/tmphlk6cjfd/report.json"}
+2025-06-20 14:50:48 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmphlk6cjfd/test_script.py | Status: SUCCESS | Context: {"content_length": 21654}
+2025-06-20 14:50:48 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmphlk6cjfd/test_script.py --json-report --json-report-file=/tmp/tmphlk6cjfd/report.json --capture=no", "working_dir": "/tmp/tmphlk6cjfd"}
+2025-06-20 14:56:52 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 363.19723868370056, "stdout_length": 36875, "stderr_length": 0}
+2025-06-20 14:56:52 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmphlk6cjfd/report.json | Status: SUCCESS
+2025-06-20 14:56:52 | ERROR    | Backend | error:94 | Test execution failed | Context: {"error": "name 'log_test_result' is not defined", "error_type": "NameError"}

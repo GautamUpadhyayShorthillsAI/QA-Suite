@@ -1,0 +1,44 @@
+2025-06-22 00:41:19 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-22 00:41:19 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-22 00:41:19 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-22 00:41:41 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-22 00:41:41 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Generate test cases for Login and Form 1", "js_content_length": 3450, "has_js_content": true}
+2025-06-22 00:41:41 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-22 00:41:51 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1781, "llm_duration": 9.833631038665771}
+2025-06-22 00:41:51 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify login page loads successfully.", "Verify presence of username, password fields, and submit button on login page.", "Test successful login with valid credentials and redirection to dashboard."]}
+2025-06-22 00:41:51 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 9.83s | Context: {"test_ideas_count": 20}
+2025-06-22 00:45:17 | INFO     | Backend | info:76 | Received script generation request
+2025-06-22 00:45:17 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "3", "selected_tests_count": 20, "js_content_length": 3450, "selected_tests_preview": ["Verify login page loads successfully.", "Verify presence of username, password fields, and submit button on login page.", "Test successful login with valid credentials and redirection to dashboard."]}
+2025-06-22 00:45:17 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-22 00:46:03 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 32575, "llm_duration": 45.34420871734619}
+2025-06-22 00:46:03 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 37160, "has_fixtures": true, "has_imports": true}
+2025-06-22 00:46:03 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 45.36s | Context: {"script_length": 37160, "tests_count": 20}
+2025-06-22 00:46:10 | INFO     | Backend | info:76 | Received script execution request
+2025-06-22 00:46:10 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 37160, "script_preview": "\n# Self-healing utility functions\ndef wait_for_element(page, selector, timeout=10000, retries=3):\n    \"\"\"Wait for element with retry mechanism and multiple selector strategies.\"\"\"\n    for attempt in r"}
+2025-06-22 00:46:10 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmprrn7t_fo", "script_path": "/tmp/tmprrn7t_fo/test_script.py", "report_path": "/tmp/tmprrn7t_fo/report.json"}
+2025-06-22 00:46:10 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmprrn7t_fo/test_script.py | Status: SUCCESS | Context: {"content_length": 37160}
+2025-06-22 00:46:10 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmprrn7t_fo/test_script.py --json-report --json-report-file=/tmp/tmprrn7t_fo/report.json --capture=no -v --tb=long --log-file=/tmp/tmprrn7t_fo/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmprrn7t_fo"}
+2025-06-22 00:48:11 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 120.83658170700073, "stdout_length": 112026, "stderr_length": 0}
+2025-06-22 00:48:11 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmprrn7t_fo/report.json | Status: SUCCESS
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_login_page_loads_successfully | Result: passed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_presence_of_login_elements | Result: passed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_successful_login_and_redirection | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_login_empty_username_valid_password_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_login_valid_username_empty_password_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_login_empty_username_empty_password_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_login_submit_button_disabled_empty_username | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_login_submit_button_disabled_empty_password | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_user_redirected_to_patient_info_form_after_login | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_presence_of_form1_fields | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_successful_submission_of_form1_valid_data | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_form1_submission_empty_first_name_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_form1_submission_empty_last_name_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_form1_submission_empty_date_of_birth_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_form1_submission_empty_age_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_form1_submission_without_selecting_gender_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_form1_submission_without_selecting_adoption_status_no_navigation | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_form1_submit_button_disabled_empty_first_name | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_form1_submit_button_disabled_no_gender | Result: failed
+2025-06-22 00:48:11 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::TestGeneConnectDoctor::test_verify_date_picker_opens_and_closes | Result: failed
+2025-06-22 00:48:11 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 20, "passed_tests": 2, "failed_tests": 18, "logs_count": 20, "detailed_failures_count": 18}
+2025-06-22 00:48:11 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 120.84s | Context: {"total_tests": 20, "passed_tests": 2, "failed_tests": 18}

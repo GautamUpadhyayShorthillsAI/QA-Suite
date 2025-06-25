@@ -1,0 +1,7 @@
+2025-06-24 14:46:23 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-24 14:46:23 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "digitree.js", "file_size": 1938, "content_length": 1938}
+2025-06-24 14:46:23 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-24 14:46:23 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "digitree.js", "file_size": 1938, "content_length": 1938}
+2025-06-24 14:46:23 | INFO     | Frontend | info:76 | Making API call to generate test ideas | Context: {"functionality": "Generate Full Flow", "js_content_length": 1938}
+2025-06-24 14:46:34 | INFO     | Frontend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "response_time": 10.154778242111206}
+2025-06-24 14:46:34 | INFO     | Frontend | info:76 | Test ideas generated and step advanced | Context: {"functionality": "Generate Full Flow", "test_ideas_count": 20}

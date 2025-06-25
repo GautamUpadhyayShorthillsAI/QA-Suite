@@ -1,0 +1,9 @@
+2025-06-23 14:57:39 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-23 14:57:39 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-23 14:57:39 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-23 14:57:58 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 14:57:58 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Full Flow", "js_content_length": 4410, "has_js_content": true}
+2025-06-23 14:57:58 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 14:58:10 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1483, "llm_duration": 11.303512811660767}
+2025-06-23 14:58:10 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful navigation to the login page.", "Verify successful login with valid credentials.", "Verify login fails and no navigation occurs with invalid username."]}
+2025-06-23 14:58:10 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 11.31s | Context: {"test_ideas_count": 20}

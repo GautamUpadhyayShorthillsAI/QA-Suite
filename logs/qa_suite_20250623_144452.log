@@ -1,0 +1,25 @@
+2025-06-23 14:44:52 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-23 14:44:52 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-23 14:44:52 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-23 14:45:13 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 14:45:13 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Generate full flow", "js_content_length": 10540, "has_js_content": true}
+2025-06-23 14:45:13 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 14:45:23 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1774, "llm_duration": 9.088673114776611}
+2025-06-23 14:45:23 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Test successful user login with valid credentials and accepted T&C.", "Test login attempt with an empty company email field, verifying no navigation.", "Test login attempt with an empty password field, verifying no navigation."]}
+2025-06-23 14:45:23 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 9.09s | Context: {"test_ideas_count": 20}
+2025-06-23 14:45:39 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-23 14:45:39 | INFO     | Backend | info:76 | Processing full flow script generation request | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login", "js_content_length": 10540}
+2025-06-23 14:45:39 | INFO     | Backend | info:76 | Calling LLM for full flow script generation
+2025-06-23 14:46:41 | INFO     | Backend | info:76 | LLM response received for full flow script generation | Context: {"response_length": 17692, "llm_duration": 62.1153883934021}
+2025-06-23 14:46:41 | INFO     | Backend | info:76 | Full flow script validation passed | Context: {"script_length": 17678}
+2025-06-23 14:46:41 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_full_flow_script | Duration: 62.12s | Context: {"script_length": 17678}
+2025-06-23 14:46:47 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 14:46:47 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 17678, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect, TimeoutError, Page, Browser\nfrom datetime import datetime\nimport time\nimport requests\nimport os # Included as per commo"}
+2025-06-23 14:46:47 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmp61tokd59", "script_path": "/tmp/tmp61tokd59/test_script.py", "report_path": "/tmp/tmp61tokd59/report.json"}
+2025-06-23 14:46:47 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmp61tokd59/test_script.py | Status: SUCCESS | Context: {"content_length": 17678}
+2025-06-23 14:46:47 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmp61tokd59/test_script.py --json-report --json-report-file=/tmp/tmp61tokd59/report.json --capture=no -v --tb=long --log-file=/tmp/tmp61tokd59/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmp61tokd59"}
+2025-06-23 14:46:53 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 6.647291421890259, "stdout_length": 2328, "stderr_length": 0}
+2025-06-23 14:46:53 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmp61tokd59/report.json | Status: SUCCESS
+2025-06-23 14:46:53 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_full_end_to_end_flow | Result: failed
+2025-06-23 14:46:53 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1, "logs_count": 1, "detailed_failures_count": 1}
+2025-06-23 14:46:53 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 6.65s | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1}

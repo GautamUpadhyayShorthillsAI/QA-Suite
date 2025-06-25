@@ -1,0 +1,5 @@
+2025-06-25 15:37:53 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]"}
+2025-06-25 15:37:53 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jump_full_flow.js", "file_size": 10432, "content_length": 10432}
+2025-06-25 15:37:53 | INFO     | Frontend | info:76 | Making API call to generate test ideas | Context: {"functionality": "5 test cases for login", "js_content_length": 10432}
+2025-06-25 15:37:56 | INFO     | Frontend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 5, "response_time": 3.3331058025360107}
+2025-06-25 15:37:56 | INFO     | Frontend | info:76 | Test ideas generated and step advanced | Context: {"functionality": "5 test cases for login", "test_ideas_count": 5}

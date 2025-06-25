@@ -1,0 +1,12 @@
+2025-06-22 15:52:11 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-22 15:52:11 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-22 15:52:11 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-22 15:52:34 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-22 15:52:34 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Generate Test cases for Login and Form 1", "js_content_length": 4672, "has_js_content": true, "website_url": ""}
+2025-06-22 15:52:34 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-22 15:52:50 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 2182, "llm_duration": 16.74658179283142}
+2025-06-22 15:52:50 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Sanity: User can successfully login with valid credentials and navigate to the dashboard.", "Edge Case: Login fails with invalid username and valid password, remaining on the login page.", "Edge Case: Login fails with valid username and invalid password, remaining on the login page."]}
+2025-06-22 15:52:50 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 16.75s | Context: {"test_ideas_count": 20}
+2025-06-22 15:53:58 | INFO     | Backend | info:76 | Received script generation request
+2025-06-22 15:53:58 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://geneconnectdoctor.shorthills.ai/login", "selected_tests_count": 20, "js_content_length": 4672, "selected_tests_preview": ["Sanity: User can successfully login with valid credentials and navigate to the dashboard.", "Edge Case: Login fails with invalid username and valid password, remaining on the login page.", "Edge Case: Login fails with valid username and invalid password, remaining on the login page."]}
+2025-06-22 15:53:58 | INFO     | Backend | info:76 | Calling LLM for script generation

@@ -1,0 +1,7 @@
+2025-06-20 16:36:19 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-20 16:36:19 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnect 2.js", "file_size": 3054, "content_length": 3054}
+2025-06-20 16:36:19 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-20 16:36:19 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnect 2.js", "file_size": 3054, "content_length": 3054}
+2025-06-20 16:36:19 | INFO     | Frontend | info:76 | Making API call to generate test ideas | Context: {"functionality": "login n form flow", "js_content_length": 3054}
+2025-06-20 16:36:32 | INFO     | Frontend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "response_time": 12.727564811706543}
+2025-06-20 16:36:32 | INFO     | Frontend | info:76 | Test ideas generated and step advanced | Context: {"functionality": "login n form flow", "test_ideas_count": 20}

@@ -1,0 +1,7 @@
+2025-06-23 10:55:47 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 10:55:47 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jumpIQ_basic.js", "file_size": 3487, "content_length": 3487}
+2025-06-23 10:55:47 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 10:55:47 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jumpIQ_basic.js", "file_size": 3487, "content_length": 3487}
+2025-06-23 10:55:47 | INFO     | Frontend | info:76 | Making API call to generate test ideas | Context: {"functionality": "Make test cases for Login; OTP and further navigation", "js_content_length": 3487}
+2025-06-23 10:56:06 | INFO     | Frontend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "response_time": 18.61587166786194}
+2025-06-23 10:56:06 | INFO     | Frontend | info:76 | Test ideas generated and step advanced | Context: {"functionality": "Make test cases for Login; OTP and further navigation", "test_ideas_count": 20}

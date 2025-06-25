@@ -1,0 +1,120 @@
+2025-06-23 10:29:43 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-23 10:29:43 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-23 10:29:43 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-23 10:30:02 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 10:30:02 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Make test cases for Login; OTP and further navigation", "js_content_length": 2413, "has_js_content": true}
+2025-06-23 10:30:02 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 10:30:12 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1778, "llm_duration": 10.000559091567993}
+2025-06-23 10:30:12 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful login with valid credentials and accepted Terms & Conditions.", "Verify login failure when Company Email field is left empty.", "Verify login failure when Password field is left empty."]}
+2025-06-23 10:30:12 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 10.00s | Context: {"test_ideas_count": 20}
+2025-06-23 10:30:17 | INFO     | Backend | info:76 | Received script generation request
+2025-06-23 10:30:17 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login?redirect=/", "selected_tests_count": 20, "js_content_length": 2413, "selected_tests_preview": ["Verify successful login with valid credentials and accepted Terms & Conditions.", "Verify login failure when Company Email field is left empty.", "Verify login failure when Password field is left empty."]}
+2025-06-23 10:30:17 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-23 10:31:03 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 17308, "llm_duration": 46.403602600097656}
+2025-06-23 10:31:03 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 17294, "has_fixtures": true, "has_imports": true}
+2025-06-23 10:31:03 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 46.41s | Context: {"script_length": 17294, "tests_count": 20}
+2025-06-23 10:31:45 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 10:31:45 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 17294, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n# FIXTURES (must include exactly):\n@pytest.fixture(scope=\"session\")\ndef browser():\n    wi"}
+2025-06-23 10:31:45 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpoxk6sdi3", "script_path": "/tmp/tmpoxk6sdi3/test_script.py", "report_path": "/tmp/tmpoxk6sdi3/report.json"}
+2025-06-23 10:31:45 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpoxk6sdi3/test_script.py | Status: SUCCESS | Context: {"content_length": 17294}
+2025-06-23 10:31:45 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpoxk6sdi3/test_script.py --json-report --json-report-file=/tmp/tmpoxk6sdi3/report.json --capture=no -v --tb=long --log-file=/tmp/tmpoxk6sdi3/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmpoxk6sdi3"}
+2025-06-23 10:34:18 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 153.49773383140564, "stdout_length": 14466, "stderr_length": 0}
+2025-06-23 10:34:18 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmpoxk6sdi3/report.json | Status: SUCCESS
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_login_with_valid_credentials | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_failure_empty_company_email | Result: failed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_failure_empty_password | Result: failed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_failure_empty_email_and_password | Result: failed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_failure_terms_not_accepted | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_failure_incorrect_company_email | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_failure_incorrect_password | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_otp_verification | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_otp_failure_first_digit_empty | Result: failed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_otp_failure_all_digits_empty | Result: failed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_otp_failure_incorrect_digits | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_instant_report_card_clickable_and_leads_to_dropdown | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_company_selection_from_dropdown | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_next_button_enabled_after_company_selection | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_navigation_after_clicking_next_with_company | Result: passed
+2025-06-23 10:34:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_next_button_disabled_no_company_selected | Result: failed
+2025-06-23 10:34:18 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 16, "passed_tests": 10, "failed_tests": 6, "logs_count": 16, "detailed_failures_count": 6}
+2025-06-23 10:34:18 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 153.50s | Context: {"total_tests": 16, "passed_tests": 10, "failed_tests": 6}
+2025-06-23 10:49:17 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 10:49:17 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "The full user workflow: Login, OTP verification, and starting an Instant Report", "js_content_length": 3313, "has_js_content": true}
+2025-06-23 10:49:17 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 10:49:24 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1870, "llm_duration": 6.8374574184417725}
+2025-06-23 10:49:24 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful login with valid company email, password, and accepted Terms & Conditions.", "Verify navigation to the OTP verification page after successful login.", "Verify login button is disabled when the company email field is left empty."]}
+2025-06-23 10:49:24 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 6.84s | Context: {"test_ideas_count": 20}
+2025-06-23 10:49:42 | INFO     | Backend | info:76 | Received script generation request
+2025-06-23 10:49:42 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login?redirect=/", "selected_tests_count": 20, "js_content_length": 3313, "selected_tests_preview": ["Verify successful login with valid company email, password, and accepted Terms & Conditions.", "Verify navigation to the OTP verification page after successful login.", "Verify login button is disabled when the company email field is left empty."]}
+2025-06-23 10:49:42 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-23 10:50:37 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 17952, "llm_duration": 54.475003242492676}
+2025-06-23 10:50:37 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 17938, "has_fixtures": true, "has_imports": true}
+2025-06-23 10:50:37 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 54.48s | Context: {"script_length": 17938, "tests_count": 20}
+2025-06-23 10:50:45 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 10:50:45 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 17938, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n@pytest.fixture(scope=\"session\")\ndef browser():\n    with sync_playwright() as p:\n        "}
+2025-06-23 10:50:45 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpblwoxbjp", "script_path": "/tmp/tmpblwoxbjp/test_script.py", "report_path": "/tmp/tmpblwoxbjp/report.json"}
+2025-06-23 10:50:45 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpblwoxbjp/test_script.py | Status: SUCCESS | Context: {"content_length": 17938}
+2025-06-23 10:50:45 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpblwoxbjp/test_script.py --json-report --json-report-file=/tmp/tmpblwoxbjp/report.json --capture=no -v --tb=long --log-file=/tmp/tmpblwoxbjp/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmpblwoxbjp"}
+2025-06-23 10:52:36 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 111.61705327033997, "stdout_length": 44533, "stderr_length": 0}
+2025-06-23 10:52:36 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmpblwoxbjp/report.json | Status: SUCCESS
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_login_and_otp_navigation | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_button_disabled_empty_email | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_button_disabled_empty_password | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_button_disabled_empty_email_and_password | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_button_disabled_terms_not_accepted | Result: passed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_attempt_empty_password_field | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_attempt_empty_email_field | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_otp_verification_and_dashboard_navigation | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_otp_submission_button_disabled_empty_fields | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_otp_submission_button_disabled_partially_filled | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_otp_submission_button_disabled_invalid_otp | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_select_instant_report_workflow | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_dealership_selection_dropdown_present | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_open_dealership_selection_dropdown | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_select_specific_dealership_from_dropdown | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_next_button_disabled_before_dealership_selection | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_navigation_to_radius_step | Result: failed
+2025-06-23 10:52:36 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_user_can_scroll_down_on_radius_step | Result: failed
+2025-06-23 10:52:36 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 18, "passed_tests": 1, "failed_tests": 17, "logs_count": 18, "detailed_failures_count": 17}
+2025-06-23 10:52:36 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 111.63s | Context: {"total_tests": 18, "passed_tests": 1, "failed_tests": 17}
+2025-06-23 10:55:47 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 10:55:47 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Make test cases for Login; OTP and further navigation", "js_content_length": 3487, "has_js_content": true}
+2025-06-23 10:55:47 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 10:56:06 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 2056, "llm_duration": 18.61124014854431}
+2025-06-23 10:56:06 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful login with valid credentials and accepted Terms & Conditions.", "Verify that navigation to the OTP page does not occur when the company email field is left empty.", "Verify that navigation to the OTP page does not occur when the password field is left empty."]}
+2025-06-23 10:56:06 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 18.61s | Context: {"test_ideas_count": 20}
+2025-06-23 10:56:47 | INFO     | Backend | info:76 | Received script generation request
+2025-06-23 10:56:47 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login?redirect=/", "selected_tests_count": 20, "js_content_length": 3487, "selected_tests_preview": ["Verify successful login with valid credentials and accepted Terms & Conditions.", "Verify that navigation to the OTP page does not occur when the company email field is left empty.", "Verify that navigation to the OTP page does not occur when the password field is left empty."]}
+2025-06-23 10:56:47 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-23 10:57:33 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 26404, "llm_duration": 45.562323331832886}
+2025-06-23 10:57:33 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 26390, "has_fixtures": true, "has_imports": true}
+2025-06-23 10:57:33 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 45.56s | Context: {"script_length": 26390, "tests_count": 20}
+2025-06-23 10:58:05 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 10:58:05 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 26390, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n@pytest.fixture(scope=\"session\")\ndef browser():\n    with sync_playwright() as p:\n        "}
+2025-06-23 10:58:05 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmp1scopku8", "script_path": "/tmp/tmp1scopku8/test_script.py", "report_path": "/tmp/tmp1scopku8/report.json"}
+2025-06-23 10:58:05 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmp1scopku8/test_script.py | Status: SUCCESS | Context: {"content_length": 26390}
+2025-06-23 10:58:05 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmp1scopku8/test_script.py --json-report --json-report-file=/tmp/tmp1scopku8/report.json --capture=no -v --tb=long --log-file=/tmp/tmp1scopku8/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmp1scopku8"}
+2025-06-23 11:00:43 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 157.81039118766785, "stdout_length": 23944, "stderr_length": 0}
+2025-06-23 11:00:43 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmp1scopku8/report.json | Status: SUCCESS
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_login_with_valid_credentials_and_accepted_terms_conditions | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_otp_page_does_not_occur_when_company_email_field_is_empty | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_otp_page_does_not_occur_when_password_field_is_empty | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_otp_page_does_not_occur_when_both_company_email_and_password_fields_are_empty | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_otp_page_does_not_occur_with_incorrect_company_email | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_otp_page_does_not_occur_with_incorrect_password | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_otp_page_does_not_occur_with_incorrect_company_email_and_password | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_sign_in_button_does_not_navigate_when_terms_conditions_are_not_accepted | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_initial_state_of_sign_in_button_before_any_user_input | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_otp_verification_with_valid_five_digit_otp | Result: failed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_dashboard_does_not_occur_when_all_otp_fields_are_left_empty | Result: failed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_dashboard_does_not_occur_when_otp_is_partially_entered | Result: failed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_dashboard_does_not_occur_with_incorrect_five_digit_otp | Result: failed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_button_is_clickable_even_when_otp_fields_are_empty | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_button_is_clickable_even_when_otp_is_partially_filled | Result: passed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_navigation_to_main_application_dashboard_after_otp_verification | Result: failed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_navigation_to_create_instant_report_modal_after_selecting_instant_report | Result: failed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_successful_navigation_to_next_step_in_report_creation_after_selecting_dealership_and_clicking_next | Result: failed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_navigation_to_next_step_occurs_when_next_is_clicked_without_selecting_a_dealership | Result: failed
+2025-06-23 11:00:43 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_dealership_selection_dropdown_opens_and_displays_options | Result: failed
+2025-06-23 11:00:43 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 20, "passed_tests": 11, "failed_tests": 9, "logs_count": 20, "detailed_failures_count": 9}
+2025-06-23 11:00:43 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 157.82s | Context: {"total_tests": 20, "passed_tests": 11, "failed_tests": 9}

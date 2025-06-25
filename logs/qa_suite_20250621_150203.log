@@ -1,0 +1,4 @@
+2025-06-21 15:02:03 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-21 15:02:03 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnect 2.js", "file_size": 3054, "content_length": 3054}
+2025-06-21 15:02:03 | INFO     | Frontend | info:76 | Making API call to generate script | Context: {"website_url": "123", "selected_tests_count": 20, "js_content_length": 3054}
+2025-06-21 15:02:03 | ERROR    | Frontend | error:94 | Exception during script generation | Context: {"error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /generate_script (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7b52a22e5c70>: Failed to establish a new connection: [Errno 111] Connection refused'))", "error_type": "ConnectionError"}

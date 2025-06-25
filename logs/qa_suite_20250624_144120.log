@@ -1,0 +1,5 @@
+2025-06-24 14:41:20 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]"}
+2025-06-24 14:41:20 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "digitree.js", "file_size": 1938, "content_length": 1938}
+2025-06-24 14:41:20 | INFO     | Frontend | info:76 | Making API call to generate script | Context: {"website_url": "https://digitreetest.shorthills.ai/auth/login", "selected_tests_count": 20, "js_content_length": 1938}
+2025-06-24 14:42:04 | INFO     | Frontend | info:76 | Script generated successfully | Context: {"script_length": 13141, "response_time": 44.241174936294556}
+2025-06-24 14:42:04 | INFO     | Frontend | info:76 | Script generated and step advanced | Context: {"selected_tests_count": 20, "script_length": 13141}

@@ -1,0 +1,77 @@
+2025-06-23 00:08:29 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-23 00:08:29 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-23 00:08:29 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-23 00:08:58 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 00:08:58 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Generate Test cases for login and form(s)", "js_content_length": 4672, "has_js_content": true}
+2025-06-23 00:08:58 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 00:09:08 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 2171, "llm_duration": 10.222967624664307}
+2025-06-23 00:09:08 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful login with valid username and password.", "Test login with empty username and valid password, verify submit button is disabled or URL does not change.", "Test login with valid username and empty password, verify submit button is disabled or URL does not change."]}
+2025-06-23 00:09:08 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 10.22s | Context: {"test_ideas_count": 20}
+2025-06-23 00:11:37 | INFO     | Backend | info:76 | Received script generation request
+2025-06-23 00:11:37 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://geneconnectdoctor.shorthills.ai/login", "selected_tests_count": 20, "js_content_length": 4672, "selected_tests_preview": ["Verify successful login with valid username and password.", "Test login with empty username and valid password, verify submit button is disabled or URL does not change.", "Test login with valid username and empty password, verify submit button is disabled or URL does not change."]}
+2025-06-23 00:11:37 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-23 00:12:39 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 18330, "llm_duration": 61.94867825508118}
+2025-06-23 00:12:39 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 18316, "has_fixtures": true, "has_imports": true}
+2025-06-23 00:12:39 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 61.95s | Context: {"script_length": 18316, "tests_count": 20}
+2025-06-23 00:12:57 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 00:12:57 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 18316, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n@pytest.fixture(scope=\"session\")\ndef browser():\n    with sync_playwright() as p:\n        "}
+2025-06-23 00:12:57 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmp4vsbtnq5", "script_path": "/tmp/tmp4vsbtnq5/test_script.py", "report_path": "/tmp/tmp4vsbtnq5/report.json"}
+2025-06-23 00:12:57 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmp4vsbtnq5/test_script.py | Status: SUCCESS | Context: {"content_length": 18316}
+2025-06-23 00:12:57 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmp4vsbtnq5/test_script.py --json-report --json-report-file=/tmp/tmp4vsbtnq5/report.json --capture=no -v --tb=long --log-file=/tmp/tmp4vsbtnq5/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmp4vsbtnq5"}
+2025-06-23 00:12:58 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 2, "execution_duration": 0.5390036106109619, "stdout_length": 2656, "stderr_length": 0}
+2025-06-23 00:12:58 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmp4vsbtnq5/report.json | Status: SUCCESS
+2025-06-23 00:12:58 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0, "logs_count": 0, "detailed_failures_count": 0}
+2025-06-23 00:12:58 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 0.54s | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0}
+2025-06-23 00:13:04 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 00:13:04 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 18316, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n@pytest.fixture(scope=\"session\")\ndef browser():\n    with sync_playwright() as p:\n        "}
+2025-06-23 00:13:04 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpqaxa9w4z", "script_path": "/tmp/tmpqaxa9w4z/test_script.py", "report_path": "/tmp/tmpqaxa9w4z/report.json"}
+2025-06-23 00:13:04 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpqaxa9w4z/test_script.py | Status: SUCCESS | Context: {"content_length": 18316}
+2025-06-23 00:13:04 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpqaxa9w4z/test_script.py --json-report --json-report-file=/tmp/tmpqaxa9w4z/report.json --capture=no -v --tb=long --log-file=/tmp/tmpqaxa9w4z/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmpqaxa9w4z"}
+2025-06-23 00:13:05 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 2, "execution_duration": 0.49620842933654785, "stdout_length": 2656, "stderr_length": 0}
+2025-06-23 00:13:05 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmpqaxa9w4z/report.json | Status: SUCCESS
+2025-06-23 00:13:05 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0, "logs_count": 0, "detailed_failures_count": 0}
+2025-06-23 00:13:05 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 0.50s | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0}
+2025-06-23 00:13:06 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 00:13:06 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 18316, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n@pytest.fixture(scope=\"session\")\ndef browser():\n    with sync_playwright() as p:\n        "}
+2025-06-23 00:13:06 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpb4ihysfk", "script_path": "/tmp/tmpb4ihysfk/test_script.py", "report_path": "/tmp/tmpb4ihysfk/report.json"}
+2025-06-23 00:13:06 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpb4ihysfk/test_script.py | Status: SUCCESS | Context: {"content_length": 18316}
+2025-06-23 00:13:06 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpb4ihysfk/test_script.py --json-report --json-report-file=/tmp/tmpb4ihysfk/report.json --capture=no -v --tb=long --log-file=/tmp/tmpb4ihysfk/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmpb4ihysfk"}
+2025-06-23 00:13:06 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 2, "execution_duration": 0.5076472759246826, "stdout_length": 2656, "stderr_length": 0}
+2025-06-23 00:13:06 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmpb4ihysfk/report.json | Status: SUCCESS
+2025-06-23 00:13:06 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0, "logs_count": 0, "detailed_failures_count": 0}
+2025-06-23 00:13:06 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 0.52s | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0}
+2025-06-23 00:13:16 | INFO     | Backend | info:76 | Received script generation request
+2025-06-23 00:13:16 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://geneconnectdoctor.shorthills.ai/login", "selected_tests_count": 20, "js_content_length": 4672, "selected_tests_preview": ["Verify successful login with valid username and password.", "Test login with empty username and valid password, verify submit button is disabled or URL does not change.", "Test login with valid username and empty password, verify submit button is disabled or URL does not change."]}
+2025-06-23 00:13:16 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-23 00:14:18 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 18818, "llm_duration": 62.51856708526611}
+2025-06-23 00:14:18 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 18804, "has_fixtures": true, "has_imports": true}
+2025-06-23 00:14:18 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 62.52s | Context: {"script_length": 18804, "tests_count": 20}
+2025-06-23 00:15:11 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 00:15:11 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 18804, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n# IMPORTS (must include exactly):\n# import pytest\n# import re\n# from playwright.sync_api "}
+2025-06-23 00:15:11 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpe89e38fa", "script_path": "/tmp/tmpe89e38fa/test_script.py", "report_path": "/tmp/tmpe89e38fa/report.json"}
+2025-06-23 00:15:11 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpe89e38fa/test_script.py | Status: SUCCESS | Context: {"content_length": 18804}
+2025-06-23 00:15:11 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpe89e38fa/test_script.py --json-report --json-report-file=/tmp/tmpe89e38fa/report.json --capture=no -v --tb=long --log-file=/tmp/tmpe89e38fa/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmpe89e38fa"}
+2025-06-23 00:20:05 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 293.6542856693268, "stdout_length": 24436, "stderr_length": 0}
+2025-06-23 00:20:05 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmpe89e38fa/report.json | Status: SUCCESS
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_initial_page_load_displays_login_form_successfully | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_successful_login_with_valid_username_and_password | Result: failed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_with_empty_username_and_valid_password_verify_submit_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_with_valid_username_and_empty_password_verify_submit_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_login_with_empty_username_and_empty_password_verify_submit_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_redirection_to_dashboard_after_successful_login | Result: failed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_successful_submission_of_patient_information_form_with_all_required_fields_filled | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_patient_information_form_submission_with_empty_first_name_verify_next_button_disabled_or_url_does_not_change | Result: failed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_patient_information_form_submission_with_empty_last_name_verify_next_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_patient_information_form_submission_with_empty_date_of_birth_verify_next_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_patient_information_form_submission_with_unselected_gender_verify_next_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_patient_information_form_submission_with_unselected_adoption_status_verify_next_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_age_field_auto_populates_correctly_after_entering_date_of_birth | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_patient_information_form_with_invalid_date_of_birth_format_verify_next_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_navigation_to_medical_history_form_after_successful_patient_information_submission | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_successful_submission_of_medical_history_form_with_selected_conditions | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_medical_history_form_submission_with_no_conditions_selected_verify_next_button_disabled_or_url_does_not_change | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_selection_and_deselection_of_diabetes_checkbox_in_medical_history_form | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_selection_and_deselection_of_asthma_checkbox_in_medical_history_form | Result: passed
+2025-06-23 00:20:05 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_verify_successful_logout_and_redirection_to_the_login_page | Result: failed
+2025-06-23 00:20:05 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 20, "passed_tests": 16, "failed_tests": 4, "logs_count": 20, "detailed_failures_count": 4}
+2025-06-23 00:20:05 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 293.66s | Context: {"total_tests": 20, "passed_tests": 16, "failed_tests": 4}

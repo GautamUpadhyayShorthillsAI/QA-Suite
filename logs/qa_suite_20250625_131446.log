@@ -1,0 +1,22 @@
+2025-06-25 13:14:46 | INFO     | Backend | info:76 | Starting QA-Suite Backend with Dynamic Self-Healing Engine | Context: {"python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-25 13:14:46 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.1, "api_key_configured": true}
+2025-06-25 13:14:46 | INFO     | Backend | info:76 | Starting Flask development server with Dynamic Self-Healing Engine | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-25 13:16:30 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-25 13:16:40 | INFO     | Backend | info:76 | Received script generation request
+2025-06-25 13:19:59 | INFO     | Backend | info:76 | Received script execution request
+2025-06-25 13:19:59 | INFO     | Backend | info:76 | Starting execution attempt 1/6
+2025-06-25 13:19:59 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-25 13:20:00 | WARNING  | Backend | warning:88 | Script failed on attempt 1.
+2025-06-25 13:20:00 | INFO     | Backend | info:76 | This was a manual retry (1/3). Retrying the same script after 10.0s.
+2025-06-25 13:20:10 | INFO     | Backend | info:76 | Starting execution attempt 2/6
+2025-06-25 13:20:10 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-25 13:20:11 | WARNING  | Backend | warning:88 | Script failed on attempt 2.
+2025-06-25 13:20:11 | INFO     | Backend | info:76 | This was a manual retry (2/3). Retrying the same script after 10.0s.
+2025-06-25 13:20:21 | INFO     | Backend | info:76 | Starting execution attempt 3/6
+2025-06-25 13:20:21 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-25 13:20:21 | WARNING  | Backend | warning:88 | Script failed on attempt 3.
+2025-06-25 13:20:21 | INFO     | Backend | info:76 | This was a manual retry (3/3). Retrying the same script after 10.0s.
+2025-06-25 13:20:31 | INFO     | Backend | info:76 | Starting execution attempt 4/6
+2025-06-25 13:20:31 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-25 13:20:32 | WARNING  | Backend | warning:88 | Script failed on attempt 4.
+2025-06-25 13:20:32 | WARNING  | Backend | warning:88 | Failure was not a selector timeout. Aborting self-healing.

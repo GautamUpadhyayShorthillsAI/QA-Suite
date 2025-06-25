@@ -1,0 +1,5 @@
+2025-06-23 10:30:17 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 10:30:17 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jumpIQ_basic.js", "file_size": 2413, "content_length": 2413}
+2025-06-23 10:30:17 | INFO     | Frontend | info:76 | Making API call to generate script | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login?redirect=/", "selected_tests_count": 20, "js_content_length": 2413}
+2025-06-23 10:31:03 | INFO     | Frontend | info:76 | Script generated successfully | Context: {"script_length": 17294, "response_time": 46.41335964202881}
+2025-06-23 10:31:03 | INFO     | Frontend | info:76 | Script generated and step advanced | Context: {"selected_tests_count": 20, "script_length": 17294}

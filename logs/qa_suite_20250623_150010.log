@@ -1,0 +1,5 @@
+2025-06-23 15:00:10 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 15:00:10 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "orange.js", "file_size": 4411, "content_length": 4410}
+2025-06-23 15:00:10 | INFO     | Frontend | info:76 | Making API call to generate a full flow script | Context: {"website_url": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login", "js_content_length": 4410}
+2025-06-23 15:00:34 | INFO     | Frontend | info:76 | Full flow script generated successfully | Context: {"script_length": 6340, "response_time": 24.44868803024292}
+2025-06-23 15:00:34 | INFO     | Frontend | info:76 | Full flow script generated and step advanced | Context: {"script_length": 6340}

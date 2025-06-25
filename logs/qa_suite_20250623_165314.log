@@ -1,0 +1,5 @@
+2025-06-23 16:53:14 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 16:53:14 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jump_full_flow.js", "file_size": 10540, "content_length": 10540}
+2025-06-23 16:53:14 | INFO     | Frontend | info:76 | Making API call to run script | Context: {"script_length": 14951}
+2025-06-23 16:53:15 | INFO     | Frontend | info:76 | Script executed successfully | Context: {"response_time": 0.6856606006622314, "has_logs": true, "logs_count": 0}
+2025-06-23 16:53:15 | INFO     | Frontend | info:76 | Script execution completed successfully | Context: {"logs_count": 0, "stats": {"failed": 0, "passed": 0, "success_rate": "0%", "total": 0}}

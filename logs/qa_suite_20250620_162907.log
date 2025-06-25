@@ -1,0 +1,33 @@
+2025-06-20 16:29:07 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-20 16:29:07 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-20 16:29:07 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-20 16:29:35 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-20 16:29:35 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "For login and signup page", "js_content_length": 3054, "has_js_content": true}
+2025-06-20 16:29:35 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-20 16:29:52 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1582, "llm_duration": 16.388202905654907}
+2025-06-20 16:29:52 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful login with valid username and password.", "Verify navigation to the expected dashboard/home page after successful login.", "Verify URL changes to the dashboard/home page after successful login."]}
+2025-06-20 16:29:52 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 16.39s | Context: {"test_ideas_count": 20}
+2025-06-20 16:29:54 | INFO     | Backend | info:76 | Received script generation request
+2025-06-20 16:29:54 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "123", "selected_tests_count": 20, "js_content_length": 3054, "selected_tests_preview": ["Verify successful login with valid username and password.", "Verify navigation to the expected dashboard/home page after successful login.", "Verify URL changes to the dashboard/home page after successful login."]}
+2025-06-20 16:29:54 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-20 16:30:48 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 6686, "llm_duration": 53.6682608127594}
+2025-06-20 16:30:48 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 6682, "has_fixtures": true, "has_imports": true}
+2025-06-20 16:30:48 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 53.67s | Context: {"script_length": 6682, "tests_count": 20}
+2025-06-20 16:31:02 | INFO     | Backend | info:76 | Received script execution request
+2025-06-20 16:31:02 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 6682, "script_preview": "```json\n{\n  \"helpers\": [\n    \"def perform_login_and_submit(page, username, password):\\n    page.fill('[data-testid=\\\"username\\\"]', username)\\n    page.fill('[data-testid=\\\"password\\\"]', password)\\n   "}
+2025-06-20 16:31:02 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpqejrcfi_", "script_path": "/tmp/tmpqejrcfi_/test_script.py", "report_path": "/tmp/tmpqejrcfi_/report.json"}
+2025-06-20 16:31:02 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpqejrcfi_/test_script.py | Status: SUCCESS | Context: {"content_length": 6682}
+2025-06-20 16:31:02 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpqejrcfi_/test_script.py --json-report --json-report-file=/tmp/tmpqejrcfi_/report.json --capture=no", "working_dir": "/tmp/tmpqejrcfi_"}
+2025-06-20 16:31:03 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 2, "execution_duration": 0.963874101638794, "stdout_length": 2208, "stderr_length": 0}
+2025-06-20 16:31:03 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmpqejrcfi_/report.json | Status: SUCCESS
+2025-06-20 16:31:03 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0, "logs_count": 0}
+2025-06-20 16:31:03 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 0.97s | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0}
+2025-06-20 16:31:10 | INFO     | Backend | info:76 | Received script execution request
+2025-06-20 16:31:10 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 6682, "script_preview": "```json\n{\n  \"helpers\": [\n    \"def perform_login_and_submit(page, username, password):\\n    page.fill('[data-testid=\\\"username\\\"]', username)\\n    page.fill('[data-testid=\\\"password\\\"]', password)\\n   "}
+2025-06-20 16:31:10 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmp0axacifo", "script_path": "/tmp/tmp0axacifo/test_script.py", "report_path": "/tmp/tmp0axacifo/report.json"}
+2025-06-20 16:31:10 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmp0axacifo/test_script.py | Status: SUCCESS | Context: {"content_length": 6682}
+2025-06-20 16:31:10 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmp0axacifo/test_script.py --json-report --json-report-file=/tmp/tmp0axacifo/report.json --capture=no", "working_dir": "/tmp/tmp0axacifo"}
+2025-06-20 16:31:11 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 2, "execution_duration": 0.9259674549102783, "stdout_length": 2208, "stderr_length": 0}
+2025-06-20 16:31:11 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmp0axacifo/report.json | Status: SUCCESS
+2025-06-20 16:31:11 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0, "logs_count": 0}
+2025-06-20 16:31:11 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 0.93s | Context: {"total_tests": 0, "passed_tests": 0, "failed_tests": 0}

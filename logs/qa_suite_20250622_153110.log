@@ -1,0 +1,8 @@
+2025-06-22 15:31:10 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-22 15:31:10 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnect 2 copy.js", "file_size": 3450, "content_length": 3450}
+2025-06-22 15:31:10 | INFO     | Frontend | info:76 | Making API call to run script | Context: {"script_length": 9692}
+2025-06-22 15:31:45 | INFO     | Frontend | info:76 | Script executed successfully | Context: {"response_time": 35.36463642120361, "has_logs": true, "logs_count": 13}
+2025-06-22 15:31:45 | INFO     | Frontend | info:76 | Script execution completed successfully | Context: {"logs_count": 13, "stats": {"failed": 12, "passed": 1, "success_rate": "7.7%", "total": 13}}
+2025-06-22 15:31:45 | INFO     | Frontend | info:76 | User completed all workflow steps | Context: {"final_step": 6, "total_steps": 7}
+2025-06-22 15:31:47 | INFO     | Frontend | info:76 | Script executed successfully | Context: {"response_time": 37.26795840263367, "has_logs": true, "logs_count": 13}
+2025-06-22 15:31:47 | ERROR    | Frontend | error:94 | Exception during script execution in UI | Context: {"error": "'logs'", "error_type": "KeyError"}

@@ -1,0 +1,51 @@
+2025-06-23 12:52:40 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-23 12:52:40 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-23 12:52:40 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-23 12:53:01 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 12:53:01 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Generate full flow", "js_content_length": 10540, "has_js_content": true}
+2025-06-23 12:53:01 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 12:53:11 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1559, "llm_duration": 9.841505765914917}
+2025-06-23 12:53:11 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful user login with valid credentials and OTP.", "Test login button state when company email field is empty.", "Test login button state when password field is empty."]}
+2025-06-23 12:53:11 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 9.85s | Context: {"test_ideas_count": 20}
+2025-06-23 12:53:16 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-23 12:53:16 | INFO     | Backend | info:76 | Processing full flow script generation request | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login?redirect=/", "js_content_length": 10540}
+2025-06-23 12:53:16 | INFO     | Backend | info:76 | Calling LLM for full flow script generation
+2025-06-23 12:53:49 | INFO     | Backend | info:76 | LLM response received for full flow script generation | Context: {"response_length": 17396, "llm_duration": 33.60911798477173}
+2025-06-23 12:53:49 | INFO     | Backend | info:76 | Full flow script validation passed | Context: {"script_length": 17382}
+2025-06-23 12:53:49 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_full_flow_script | Duration: 33.61s | Context: {"script_length": 17382}
+2025-06-23 12:55:07 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 12:55:07 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 17382, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect, TimeoutError\nfrom datetime import datetime\nimport time\nimport requests\n\n# URL for the self-healing API endpoint\nSELF_HE"}
+2025-06-23 12:55:07 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpwtqinv7o", "script_path": "/tmp/tmpwtqinv7o/test_script.py", "report_path": "/tmp/tmpwtqinv7o/report.json"}
+2025-06-23 12:55:07 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpwtqinv7o/test_script.py | Status: SUCCESS | Context: {"content_length": 17382}
+2025-06-23 12:55:07 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpwtqinv7o/test_script.py --json-report --json-report-file=/tmp/tmpwtqinv7o/report.json --capture=no -v --tb=long --log-file=/tmp/tmpwtqinv7o/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmpwtqinv7o"}
+2025-06-23 12:55:18 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 11.700816869735718, "stdout_length": 6080, "stderr_length": 0}
+2025-06-23 12:55:18 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmpwtqinv7o/report.json | Status: SUCCESS
+2025-06-23 12:55:18 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_full_end_to_end_flow | Result: failed
+2025-06-23 12:55:18 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1, "logs_count": 1, "detailed_failures_count": 1}
+2025-06-23 12:55:18 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 11.71s | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1}
+2025-06-23 12:55:28 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 12:55:28 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 17382, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect, TimeoutError\nfrom datetime import datetime\nimport time\nimport requests\n\n# URL for the self-healing API endpoint\nSELF_HE"}
+2025-06-23 12:55:28 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmphnxqsvyx", "script_path": "/tmp/tmphnxqsvyx/test_script.py", "report_path": "/tmp/tmphnxqsvyx/report.json"}
+2025-06-23 12:55:28 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmphnxqsvyx/test_script.py | Status: SUCCESS | Context: {"content_length": 17382}
+2025-06-23 12:55:28 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmphnxqsvyx/test_script.py --json-report --json-report-file=/tmp/tmphnxqsvyx/report.json --capture=no -v --tb=long --log-file=/tmp/tmphnxqsvyx/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmphnxqsvyx"}
+2025-06-23 12:55:40 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 12.482192516326904, "stdout_length": 6080, "stderr_length": 0}
+2025-06-23 12:55:40 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmphnxqsvyx/report.json | Status: SUCCESS
+2025-06-23 12:55:40 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_full_end_to_end_flow | Result: failed
+2025-06-23 12:55:40 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1, "logs_count": 1, "detailed_failures_count": 1}
+2025-06-23 12:55:40 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 12.49s | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1}
+2025-06-23 12:55:44 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-23 12:55:44 | INFO     | Backend | info:76 | Processing full flow script generation request | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login?redirect=/", "js_content_length": 10540}
+2025-06-23 12:55:44 | INFO     | Backend | info:76 | Calling LLM for full flow script generation
+2025-06-23 12:56:19 | INFO     | Backend | info:76 | LLM response received for full flow script generation | Context: {"response_length": 16124, "llm_duration": 34.5625638961792}
+2025-06-23 12:56:19 | INFO     | Backend | info:76 | Full flow script validation passed | Context: {"script_length": 16110}
+2025-06-23 12:56:19 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_full_flow_script | Duration: 34.56s | Context: {"script_length": 16110}
+2025-06-23 12:56:25 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 12:56:25 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 16110, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect, TimeoutError\nfrom datetime import datetime\nimport time\nimport requests\n\n# URL for the self-healing API endpoint\nSELF_HE"}
+2025-06-23 12:56:25 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmp39larxv1", "script_path": "/tmp/tmp39larxv1/test_script.py", "report_path": "/tmp/tmp39larxv1/report.json"}
+2025-06-23 12:56:25 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmp39larxv1/test_script.py | Status: SUCCESS | Context: {"content_length": 16110}
+2025-06-23 12:56:25 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmp39larxv1/test_script.py --json-report --json-report-file=/tmp/tmp39larxv1/report.json --capture=no -v --tb=long --log-file=/tmp/tmp39larxv1/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmp39larxv1"}
+2025-06-23 12:56:39 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 13.457359790802002, "stdout_length": 3759, "stderr_length": 0}
+2025-06-23 12:56:39 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmp39larxv1/report.json | Status: SUCCESS
+2025-06-23 12:56:39 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_full_end_to_end_flow | Result: failed
+2025-06-23 12:56:39 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1, "logs_count": 1, "detailed_failures_count": 1}
+2025-06-23 12:56:39 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 13.46s | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1}

@@ -1,0 +1,20 @@
+2025-06-23 00:27:31 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-23 00:27:31 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-23 00:27:31 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-23 00:28:53 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 00:28:53 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Generate Test Cases for Login and Form(s)", "js_content_length": 4672, "has_js_content": true}
+2025-06-23 00:28:53 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 00:29:03 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 1915, "llm_duration": 10.917120218276978}
+2025-06-23 00:29:03 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful navigation to the login page and display of login form.", "Verify successful login with valid credentials redirects to the dashboard.", "Verify login button remains disabled when username field is empty."]}
+2025-06-23 00:29:03 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 10.92s | Context: {"test_ideas_count": 20}
+2025-06-23 00:29:09 | INFO     | Backend | info:76 | Received script generation request
+2025-06-23 00:29:09 | INFO     | Backend | info:76 | Processing script generation request | Context: {"website_url": "https://geneconnectdoctor.shorthills.ai/login", "selected_tests_count": 20, "js_content_length": 4672, "selected_tests_preview": ["Verify successful navigation to the login page and display of login form.", "Verify successful login with valid credentials redirects to the dashboard.", "Verify login button remains disabled when username field is empty."]}
+2025-06-23 00:29:09 | INFO     | Backend | info:76 | Calling LLM for script generation
+2025-06-23 00:30:05 | INFO     | Backend | info:76 | LLM response received for script generation | Context: {"response_length": 18135, "llm_duration": 56.14456629753113}
+2025-06-23 00:30:05 | INFO     | Backend | info:76 | Script validation passed | Context: {"script_length": 18121, "has_fixtures": true, "has_imports": true}
+2025-06-23 00:30:05 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_script | Duration: 56.15s | Context: {"script_length": 18121, "tests_count": 20}
+2025-06-23 00:30:27 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 00:30:27 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 18121, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n@pytest.fixture(scope=\"session\")\ndef browser():\n    with sync_playwright() as p:\n        "}
+2025-06-23 00:30:27 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmpxyvwybhs", "script_path": "/tmp/tmpxyvwybhs/test_script.py", "report_path": "/tmp/tmpxyvwybhs/report.json"}
+2025-06-23 00:30:27 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmpxyvwybhs/test_script.py | Status: SUCCESS | Context: {"content_length": 18121}
+2025-06-23 00:30:27 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmpxyvwybhs/test_script.py --json-report --json-report-file=/tmp/tmpxyvwybhs/report.json --capture=no -v --tb=long --log-file=/tmp/tmpxyvwybhs/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmpxyvwybhs"}

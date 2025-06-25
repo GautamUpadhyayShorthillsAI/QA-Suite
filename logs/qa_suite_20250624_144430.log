@@ -1,0 +1,52 @@
+2025-06-24 14:44:30 | INFO     | Backend | info:76 | Starting QA-Suite Backend with Dynamic Self-Healing Engine | Context: {"python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-24 14:44:30 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.1, "api_key_configured": true}
+2025-06-24 14:44:30 | INFO     | Backend | info:76 | Starting Flask development server with Dynamic Self-Healing Engine | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-24 14:46:23 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 14:46:37 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-24 14:47:02 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 14:47:02 | INFO     | Backend | info:76 | Starting execution attempt 1/4
+2025-06-24 14:47:02 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 14:47:31 | WARNING  | Backend | warning:88 | Script failed on attempt 1. Analyzing for self-healing.
+2025-06-24 14:47:31 | WARNING  | Backend | warning:88 | Failure was not a selector timeout. Aborting self-healing.
+2025-06-24 14:50:14 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 14:50:25 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-24 14:50:39 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 14:50:39 | INFO     | Backend | info:76 | Starting execution attempt 1/4
+2025-06-24 14:50:39 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 14:51:12 | WARNING  | Backend | warning:88 | Script failed on attempt 1. Analyzing for self-healing.
+2025-06-24 14:51:12 | ERROR    | Backend | error:94 | Could not parse failing command from traceback. | Context: {"traceback_preview": "except Exception as error:\n>           raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nE           playwright._impl._errors.Error: Locator.click: Error: strict mode violation: locator(\".hover\\\\:brightness-90:nth-child(1) > .ant-btn-icon\") resolved to 2 elements:\nE               1) <span class=\"ant-btn-icon\">\u2026</span> aka get_by_role(\"button\", name=\"eye View Tree\").nth(1)\nE               2) <span class=\"ant-btn-icon\">\u2026</span> aka get_by_role(\"button\", name=\"eye View Tree\").nth(2)\nE           \nE           Call log:\nE             - waiting for locator(\".hover\\\\:brightness-90:nth-child(1) > .ant-btn-icon\")\n\n/home/shtlp_0133/Desktop/Dev_Code_Test_suite/venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:528: Error\n=========================== short test summary info ============================\nFAILED test_script.py::test_complete_end_to_end_workflow - playwright._impl._...\n============================== 1 failed in 32.69s ==============================\n"}
+2025-06-24 14:51:12 | ERROR    | Backend | error:94 | Could not parse failing command from traceback. Aborting self-heal.
+2025-06-24 14:57:09 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 14:57:43 | INFO     | Backend | info:76 | Received script generation request
+2025-06-24 14:58:06 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 14:58:06 | INFO     | Backend | info:76 | Starting execution attempt 1/4
+2025-06-24 14:58:06 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 14:59:56 | WARNING  | Backend | warning:88 | Script failed on attempt 1. Analyzing for self-healing.
+2025-06-24 14:59:56 | ERROR    | Backend | error:94 | Could not parse failing command from traceback. | Context: {"traceback_preview": "   return await cb()\n        task = asyncio.current_task(self._loop)\n        st: List[inspect.FrameInfo] = getattr(task, \"__pw_stack__\", inspect.stack())\n        parsed_st = _extract_stack_trace_information_from_stack(st, is_internal)\n        self._api_zone.set(parsed_st)\n        try:\n            return await cb()\n        except Exception as error:\n>           raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nE           playwright._impl._errors.TimeoutError: Locator.click: Timeout 60000ms exceeded.\nE           Call log:\nE             - waiting for locator(\".ant-tabs-tab:nth-child(2)\")\n\n/home/shtlp_0133/Desktop/Dev_Code_Test_suite/venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:528: TimeoutError\n=========================== short test summary info ============================\nFAILED test_script.py::test_jump_iq_workflow[Successful End-to-End User Workflow Execution]\n================== 1 failed, 19 skipped in 109.73s (0:01:49) ===================\n"}
+2025-06-24 14:59:56 | ERROR    | Backend | error:94 | Could not parse failing command from traceback. Aborting self-heal.
+2025-06-24 15:00:03 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-24 15:00:23 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 15:00:23 | INFO     | Backend | info:76 | Starting execution attempt 1/4
+2025-06-24 15:00:23 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 15:03:04 | WARNING  | Backend | warning:88 | Script failed on attempt 1. Analyzing for self-healing.
+2025-06-24 15:03:04 | INFO     | Backend | info:76 | Extracted context for self-healing. | Context: {"failing_command": "page.locator('#rc_select_3').click()", "user_intent": "STEP 28: Open the dealership selection dropdown for filtering."}
+2025-06-24 15:03:04 | INFO     | Backend | info:76 | Attempting AI self-healing for a failing selector.
+2025-06-24 15:03:20 | INFO     | Backend | info:76 | AI self-healing provided a potential fix. | Context: {"fix": "page.get_by_role('combobox', name='Dealership').click()"}
+2025-06-24 15:03:20 | INFO     | Backend | info:76 | AI suggested fix: Replacing 'page.locator('#rc_select_3').click()' with 'page.get_by_role('combobox', name='Dealership').click()'
+2025-06-24 15:03:20 | INFO     | Backend | info:76 | Starting execution attempt 2/4
+2025-06-24 15:03:20 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 15:05:39 | WARNING  | Backend | warning:88 | Script failed on attempt 2. Analyzing for self-healing.
+2025-06-24 15:05:39 | INFO     | Backend | info:76 | Extracted context for self-healing. | Context: {"failing_command": "page.get_by_role('combobox', name='Dealership').click()", "user_intent": "STEP 28: Open the dealership selection dropdown for filtering."}
+2025-06-24 15:05:39 | INFO     | Backend | info:76 | Attempting AI self-healing for a failing selector.
+2025-06-24 15:06:22 | INFO     | Backend | info:76 | AI self-healing provided a potential fix. | Context: {"fix": "page.get_by_role('combobox').filter(has_text='Dealership').click()"}
+2025-06-24 15:06:22 | INFO     | Backend | info:76 | AI suggested fix: Replacing 'page.get_by_role('combobox', name='Dealership').click()' with 'page.get_by_role('combobox').filter(has_text='Dealership').click()'
+2025-06-24 15:06:22 | INFO     | Backend | info:76 | Starting execution attempt 3/4
+2025-06-24 15:06:22 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 15:08:08 | WARNING  | Backend | warning:88 | Script failed on attempt 3. Analyzing for self-healing.
+2025-06-24 15:08:08 | INFO     | Backend | info:76 | Extracted context for self-healing. | Context: {"failing_command": "page.locator('.ant-tabs-tab:nth-child(2)').click()", "user_intent": "Click on <div> \"F&I\""}
+2025-06-24 15:08:08 | INFO     | Backend | info:76 | Attempting AI self-healing for a failing selector.
+2025-06-24 15:08:21 | INFO     | Backend | info:76 | AI self-healing provided a potential fix. | Context: {"fix": "page.get_by_role('tab', name='F&I').click()"}
+2025-06-24 15:08:21 | INFO     | Backend | info:76 | AI suggested fix: Replacing 'page.locator('.ant-tabs-tab:nth-child(2)').click()' with 'page.get_by_role('tab', name='F&I').click()'
+2025-06-24 15:08:21 | INFO     | Backend | info:76 | Starting execution attempt 4/4
+2025-06-24 15:08:21 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 15:11:38 | ERROR    | Backend | error:94 | Max healing retries reached. Aborting.

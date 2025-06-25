@@ -1,0 +1,4 @@
+2025-06-21 13:32:24 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-21 13:32:24 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnect 2.js", "file_size": 2615, "content_length": 2615}
+2025-06-21 13:35:35 | INFO     | Frontend | info:76 | Script executed successfully | Context: {"response_time": 204.0605981349945, "has_logs": true, "logs_count": 21}
+2025-06-21 13:35:35 | ERROR    | Frontend | error:94 | Exception during script execution in UI | Context: {"error": "'logs'", "error_type": "KeyError"}

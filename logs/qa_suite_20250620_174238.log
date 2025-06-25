@@ -1,0 +1,6 @@
+2025-06-20 17:42:38 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-20 17:42:38 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnectRecord.js", "file_size": 7298, "content_length": 7298}
+2025-06-20 17:42:38 | INFO     | Frontend | info:76 | Making API call to generate test ideas | Context: {"functionality": "Complete login and first form test cases", "js_content_length": 7298}
+2025-06-20 17:42:50 | INFO     | Frontend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "response_time": 11.748443126678467}
+2025-06-20 17:42:50 | INFO     | Frontend | info:76 | Test ideas generated and step advanced | Context: {"functionality": "Complete login and first form test cases", "test_ideas_count": 20}
+2025-06-20 17:42:50 | INFO     | Frontend | info:76 | User completed all workflow steps | Context: {"final_step": 6, "total_steps": 7}

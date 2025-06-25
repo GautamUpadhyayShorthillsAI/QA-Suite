@@ -1,0 +1,27 @@
+2025-06-24 12:08:58 | INFO     | Backend | info:76 | Starting QA-Suite Backend with Dynamic Self-Healing Engine | Context: {"python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-24 12:08:58 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.1, "api_key_configured": true}
+2025-06-24 12:08:58 | INFO     | Backend | info:76 | Starting Flask development server with Dynamic Self-Healing Engine | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-24 12:09:24 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 12:09:40 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-24 12:10:15 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 12:10:15 | INFO     | Backend | info:76 | Starting execution attempt 1/4
+2025-06-24 12:10:15 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 12:12:03 | WARNING  | Backend | warning:88 | Script failed on attempt 1. Analyzing for self-healing.
+2025-06-24 12:12:03 | INFO     | Backend | info:76 | Extracted context for self-healing. | Context: {"failing_command": "page.locator(\".ant-tabs-tab:nth-child(2)\").click()", "user_intent": "STEP 12: Select the second tab option in the configuration interface."}
+2025-06-24 12:12:03 | INFO     | Backend | info:76 | Attempting AI self-healing for a failing selector.
+2025-06-24 12:12:15 | INFO     | Backend | info:76 | AI self-healing provided a potential fix. | Context: {"fix": "page.get_by_role(\"button\", name=\"Radius\").click()"}
+2025-06-24 12:12:15 | INFO     | Backend | info:76 | AI suggested fix: Replacing 'page.locator(".ant-tabs-tab:nth-child(2)").click()' with 'page.get_by_role("button", name="Radius").click()'
+2025-06-24 12:12:15 | INFO     | Backend | info:76 | Starting execution attempt 2/4
+2025-06-24 12:12:15 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 12:15:44 | INFO     | Backend | info:76 | Script executed successfully on attempt 2.
+2025-06-24 12:47:21 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 12:47:35 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-24 12:47:55 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 12:47:55 | INFO     | Backend | info:76 | Starting execution attempt 1/4
+2025-06-24 12:47:55 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-24 12:49:35 | INFO     | Backend | info:76 | Script executed successfully on attempt 1.
+2025-06-24 14:26:53 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-24 14:27:07 | INFO     | Backend | info:76 | Received script generation request
+2025-06-24 14:28:53 | INFO     | Backend | info:76 | Received script execution request
+2025-06-24 14:28:53 | INFO     | Backend | info:76 | Starting execution attempt 1/4
+2025-06-24 14:28:53 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.

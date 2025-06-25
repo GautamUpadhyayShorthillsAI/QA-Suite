@@ -157,13 +157,99 @@ def generate_playwright_script(js_file_content, selected_tests, website_url):
         return "# Error generating script"
 
 
-def run_playwright_script(script_content):
+def generate_full_flow_script(js_file_content, website_url):
     start_time = time.time()
-    logger.info("Making API call to run script", script_length=len(script_content))
+    logger.info(
+        "Making API call to generate a full flow script",
+        website_url=website_url,
+        js_content_length=len(js_file_content),
+    )
 
     try:
         response = requests.post(
-            f"{BACKEND_URL}/run_script", json={"script_content": script_content}
+            f"{BACKEND_URL}/generate_full_flow_script",
+            json={
+                "js_file_content": js_file_content,
+                "website_url": website_url,
+            },
+        )
+
+        response_time = time.time() - start_time
+        log_api_call(
+            "/generate_full_flow_script",
+            "POST",
+            response.status_code,
+            response_time,
+            website_url=website_url,
+        )
+
+        if response.status_code == 200:
+            script = response.json().get("script", "")
+            logger.info(
+                "Full flow script generated successfully",
+                script_length=len(script),
+                response_time=response_time,
+            )
+            return script
+        else:
+            logger.error(
+                "Failed to generate full flow script",
+                status_code=response.status_code,
+                response_text=response.text,
+            )
+            st.error(f"Error generating full flow script: {response.text}")
+            return "# Error generating script"
+
+    except Exception as e:
+        logger.error(
+            "Exception during full flow script generation",
+            error=str(e),
+            error_type=type(e).__name__,
+        )
+        st.error(f"Error generating full flow script: {str(e)}")
+        return "# Error generating script"
+
+
+def run_playwright_script(
+    script_content: str,
+    execution_mode: str,
+    manual_retries: int = 1,
+    max_healing_retries: int = 2,
+    manual_wait: float = 10.0,
+):
+    """Execute the provided Playwright script via the backend.
+
+    Parameters
+    ----------
+    script_content : str
+        The Python Playwright test script to execute.
+    execution_mode : str
+        Either ``"full_flow"`` for self-healing runs or ``"specific_tests"`` for strict runs.
+    manual_retries : int, optional
+        Number of manual retries before invoking the AI self-healing logic (only used in full-flow mode).
+    max_healing_retries : int, optional
+        Maximum number of AI healing iterations after the manual retries.
+    manual_wait : float, optional
+        Seconds to wait between manual retries.
+    """
+
+    start_time = time.time()
+    logger.info(
+        "Making API call to run script",
+        script_length=len(script_content),
+        execution_mode=execution_mode,
+    )
+
+    try:
+        response = requests.post(
+            f"{BACKEND_URL}/run_script",
+            json={
+                "script_content": script_content,
+                "execution_mode": execution_mode,
+                "manual_retries": manual_retries,
+                "max_healing_retries": max_healing_retries,
+                "manual_wait": manual_wait,
+            },
         )
 
         response_time = time.time() - start_time
@@ -173,6 +259,7 @@ def run_playwright_script(script_content):
             response.status_code,
             response_time,
             script_length=len(script_content),
+            execution_mode=execution_mode,
         )
 
         if response.status_code == 200:
@@ -183,6 +270,7 @@ def run_playwright_script(script_content):
                 has_logs="logs" in result,
                 logs_count=len(result.get("logs", [])),
             )
+            st.session_state["response_data"] = result
             return result
         else:
             logger.error(
@@ -227,6 +315,9 @@ if "test_ideas" not in st.session_state:
     st.session_state.test_ideas = []
 if "generated_script" not in st.session_state:
     st.session_state.generated_script = ""
+if "execution_mode" not in st.session_state:
+    # default to strict mode until the user explicitly generates a full-flow script
+    st.session_state.execution_mode = "specific_tests"
 
 steps = [
     "Enter URL",
@@ -339,23 +430,71 @@ if st.session_state.current_step >= 3 and st.session_state.test_ideas:
         if st.checkbox(idea, value=True):
             selected_tests.append(idea)
 
-    if st.button("🚀 Generate Script for Selected Tests"):
-        if selected_tests:
-            log_user_action(
-                "clicked_generate_script",
-                selected_tests_count=len(selected_tests),
-                selected_tests=selected_tests,
-            )
-            with st.spinner("✍️ Writing the Playwright script..."):
+    # Place the buttons in columns for a cleaner layout
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("🚀 Generate Script for Selected Tests"):
+            if selected_tests:
+                log_user_action(
+                    "clicked_generate_script",
+                    selected_tests_count=len(selected_tests),
+                    selected_tests=selected_tests,
+                )
+                with st.spinner("✍️ Writing the Playwright script..."):
+                    start_time = time.time()
+                    st.session_state.generated_script = generate_playwright_script(
+                        js_file_content, selected_tests, website_url
+                    )
+                    generation_time = time.time() - start_time
+                    log_performance(
+                        "script_generation_ui",
+                        generation_time,
+                        selected_tests_count=len(selected_tests),
+                        script_length=len(st.session_state.generated_script),
+                    )
+
+                if (
+                    st.session_state.generated_script
+                    and not st.session_state.generated_script.startswith("# Error")
+                ):
+                    # STRICT mode – disable healing
+                    st.session_state.execution_mode = "specific_tests"
+                    if st.session_state.current_step < 4:
+                        log_step(
+                            "Generate Script",
+                            4,
+                            len(steps),
+                            selected_tests_count=len(selected_tests),
+                            script_length=len(st.session_state.generated_script),
+                        )
+                    st.session_state.current_step = max(
+                        st.session_state.current_step, 4
+                    )
+                    logger.info(
+                        "Script generated and step advanced",
+                        selected_tests_count=len(selected_tests),
+                        script_length=len(st.session_state.generated_script),
+                    )
+            else:
+                logger.warning(
+                    "User attempted to generate script without selecting any tests"
+                )
+                st.warning("Please select at least one test case.")
+
+    with col2:
+        # ---- THIS IS THE NEW BUTTON ----
+        if st.button("🌊 Generate Full Flow Script"):
+            log_user_action("clicked_generate_full_flow_script")
+            with st.spinner("✍️ Writing the full end-to-end flow script..."):
                 start_time = time.time()
-                st.session_state.generated_script = generate_playwright_script(
-                    js_file_content, selected_tests, website_url
+                st.session_state.generated_script = generate_full_flow_script(
+                    js_file_content, website_url
                 )
                 generation_time = time.time() - start_time
                 log_performance(
-                    "script_generation_ui",
+                    "full_flow_script_generation_ui",
                     generation_time,
-                    selected_tests_count=len(selected_tests),
                     script_length=len(st.session_state.generated_script),
                 )
 
@@ -363,25 +502,20 @@ if st.session_state.current_step >= 3 and st.session_state.test_ideas:
                 st.session_state.generated_script
                 and not st.session_state.generated_script.startswith("# Error")
             ):
+                # FULL FLOW mode – enable self-healing
+                st.session_state.execution_mode = "full_flow"
                 if st.session_state.current_step < 4:
                     log_step(
-                        "Generate Script",
+                        "Generate Full Flow Script",
                         4,
                         len(steps),
-                        selected_tests_count=len(selected_tests),
                         script_length=len(st.session_state.generated_script),
                     )
                 st.session_state.current_step = max(st.session_state.current_step, 4)
                 logger.info(
-                    "Script generated and step advanced",
-                    selected_tests_count=len(selected_tests),
+                    "Full flow script generated and step advanced",
                     script_length=len(st.session_state.generated_script),
                 )
-        else:
-            logger.warning(
-                "User attempted to generate script without selecting any tests"
-            )
-            st.warning("Please select at least one test case.")
 
 # Step 5: Edit & Save Script
 if st.session_state.current_step >= 4 and st.session_state.generated_script:
@@ -415,12 +549,43 @@ if st.session_state.current_step >= 5:
     logger.debug("Rendering Step 6: Run test cases")
     st.markdown("---")
     st.subheader("▶️ Run Test Cases & View Logs")
+    # Advanced settings for healing engine
+    with st.expander("⚙️ Advanced Run Settings"):
+        col_adv1, col_adv2 = st.columns(2)
+        with col_adv1:
+            manual_retries_input = st.number_input(
+                "Manual Retries Before AI Healing",
+                min_value=0,
+                max_value=5,
+                value=int(st.session_state.get("manual_retries", 3)),
+                help="How many times to rerun the same script on failure before invoking the AI engine.",
+            )
+        with col_adv2:
+            max_heal_input = st.number_input(
+                "Max AI Healing Attempts",
+                min_value=1,
+                max_value=5,
+                value=int(st.session_state.get("max_heal_retries", 3)),
+                help="Maximum number of AI fix iterations after manual retries are exhausted.",
+            )
+        st.session_state.manual_retries = manual_retries_input
+        st.session_state.max_heal_retries = max_heal_input
+        st.session_state.manual_wait = 10.0  # constant for now, could expose
+
     if st.button("▶️ Run Script"):
         log_user_action("clicked_run_script", script_length=len(script_to_run))
         with st.spinner("...Executing tests..."):
             try:
                 start_time = time.time()
-                response = run_playwright_script(script_to_run)
+                response = run_playwright_script(
+                    script_to_run,
+                    st.session_state.execution_mode,
+                    manual_retries=int(st.session_state.get("manual_retries", 3)),
+                    max_healing_retries=int(
+                        st.session_state.get("max_heal_retries", 3)
+                    ),
+                    manual_wait=float(st.session_state.get("manual_wait", 10.0)),
+                )
                 execution_time = time.time() - start_time
                 log_performance(
                     "script_execution_ui",
@@ -454,6 +619,7 @@ if st.session_state.current_step >= 5:
                         st.session_state["execution_summary"] = response.get(
                             "execution_summary", {}
                         )
+                        st.session_state["response_data"] = response
                         logger.info(
                             "Script execution completed successfully",
                             logs_count=len(st.session_state["logs"]),
@@ -512,7 +678,7 @@ if st.session_state.current_step >= 5:
         # Create a cleaner list of logs for display
         display_logs = [
             {
-                "Test Case": log.get("action", "Unknown"),
+                "Test Case": log.get("action", "Unknown").split("::")[-1],
                 "Result": log.get("result", "Unknown"),
                 "Duration": log.get("duration", "0s"),
             }
@@ -527,6 +693,38 @@ if st.session_state.current_step >= 5:
             delta=f"{stats['failed']} Failed or Errored",
             delta_color="inverse" if stats["failed"] > 0 else "off",
         )
+
+        # ---- NEW: Visualize AI Self-Healing attempts ----
+        response_data = st.session_state.get("response_data", {})
+        healing_attempts = (
+            response_data.get("healing_attempts", [])
+            if isinstance(response_data, dict)
+            else []
+        )
+        if healing_attempts:
+            st.subheader("🤖 AI Self-Healing Analysis")
+            st.info(
+                f"The initial script failed, but the AI engine performed {len(healing_attempts)} repair(s) to pass the test."
+            )
+            for idx, attempt in enumerate(healing_attempts, start=1):
+                with st.expander(f"🩹 Healing Attempt #{idx}", expanded=True):
+                    st.write(f"**Intent:** `{attempt.get('user_intent','')}`")
+                    st.error(
+                        f"**Failed Command:** `{attempt.get('failing_command','')}`"
+                    )
+                    st.success(
+                        f"**AI Suggested Fix:** `{attempt.get('fixed_command','')}`"
+                    )
+            # reconstruct final healed script
+            final_script = script_to_run
+            for attempt in healing_attempts:
+                fc = attempt.get("failing_command")
+                fix = attempt.get("fixed_command")
+                if fc and fix:
+                    final_script = final_script.replace(fc, fix, 1)
+            st.subheader("✅ Final Healed Script")
+            st.info("This is the script version that passed after all AI repairs.")
+            st.code(final_script, language="python")
 
         # UPDATED: Display detailed failure information with better categorization
         if st.session_state.get("detailed_failures"):

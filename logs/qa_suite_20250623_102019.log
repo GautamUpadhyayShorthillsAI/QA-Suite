@@ -1,0 +1,4 @@
+2025-06-23 10:20:19 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 10:20:19 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "jumpIQ_basic.js", "file_size": 2413, "content_length": 2413}
+2025-06-23 10:20:19 | INFO     | Frontend | info:76 | Making API call to generate script | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login?redirect=/", "selected_tests_count": 20, "js_content_length": 2413}
+2025-06-23 10:21:17 | ERROR    | Frontend | error:94 | Failed to generate script | Context: {"status_code": 500, "response_text": "{\n  \"error\": \"Generated script missing required fixtures or imports: ['def page(', 'def browser(', 'import re', 'from playwright.sync_api import sync_playwright, expect', 'from datetime import datetime']\"\n}\n"}

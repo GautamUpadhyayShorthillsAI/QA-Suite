@@ -1,0 +1,38 @@
+2025-06-23 23:55:24 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-23 23:55:24 | INFO     | Frontend | info:76 | Initialized session state | Context: {"current_step": 0}
+2025-06-23 23:55:33 | INFO     | QA-Suite | user_action:150 | USER ACTION: entered_website_url | Context: {"url": "https://valueinsightpro.jumpiq.com/auth/login"}
+2025-06-23 23:55:33 | INFO     | QA-Suite | step:108 | STEP [1/7] Enter Website URL | Context: {"url": "https://valueinsightpro.jumpiq.com/auth/login"}
+2025-06-23 23:55:36 | INFO     | QA-Suite | user_action:150 | USER ACTION: uploaded_js_file | Context: {"filename": "jump_full_flow.js", "file_size": 10540}
+2025-06-23 23:55:36 | INFO     | QA-Suite | step:108 | STEP [2/7] Upload JS File | Context: {"filename": "jump_full_flow.js", "file_size": 10540}
+2025-06-23 23:55:43 | INFO     | QA-Suite | user_action:150 | USER ACTION: clicked_generate_test_ideas | Context: {"functionality": "for full flow"}
+2025-06-23 23:55:53 | INFO     | QA-Suite | api_call:124 | API POST /generate_test_ideas | Status: 200 | Time: 9.57s | Context: {"functionality": "for full flow", "js_content_length": 10540}
+2025-06-23 23:55:53 | INFO     | QA-Suite | performance:157 | PERFORMANCE test_ideas_generation_ui | Duration: 9.58s | Context: {"functionality": "for full flow", "test_ideas_count": 20}
+2025-06-23 23:55:53 | INFO     | QA-Suite | step:108 | STEP [3/7] Generate Test Ideas | Context: {"functionality": "for full flow", "test_ideas_count": 20}
+2025-06-23 23:58:06 | INFO     | QA-Suite | user_action:150 | USER ACTION: clicked_generate_full_flow_script
+2025-06-23 23:58:56 | INFO     | QA-Suite | api_call:124 | API POST /generate_full_flow_script | Status: 200 | Time: 49.82s | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login"}
+2025-06-23 23:58:56 | INFO     | QA-Suite | performance:157 | PERFORMANCE full_flow_script_generation_ui | Duration: 49.83s | Context: {"script_length": 19896}
+2025-06-23 23:58:56 | INFO     | QA-Suite | step:108 | STEP [4/7] Generate Full Flow Script | Context: {"script_length": 19896}
+2025-06-23 23:59:22 | INFO     | QA-Suite | user_action:150 | USER ACTION: clicked_run_script | Context: {"script_length": 19896}
+2025-06-24 00:03:32 | INFO     | QA-Suite | api_call:124 | API POST /run_script | Status: 200 | Time: 249.71s | Context: {"script_length": 19896}
+2025-06-24 00:03:32 | INFO     | QA-Suite | performance:157 | PERFORMANCE script_execution_ui | Duration: 249.71s | Context: {"script_length": 19896}
+2025-06-24 00:03:32 | INFO     | QA-Suite | step:108 | STEP [6/7] Run Tests | Context: {"logs_count": 1, "stats": {"failed": 1, "passed": 0, "success_rate": "0.0%", "total": 1}}
+2025-06-24 00:03:32 | INFO     | QA-Suite | user_action:150 | USER ACTION: downloaded_results | Context: {"script_length": 19896, "logs_count": 1}
+2025-06-24 00:03:32 | INFO     | QA-Suite | step:108 | STEP [7/7] Download Results | Context: {"script_length": 19896, "logs_count": 1}
+2025-06-24 00:15:02 | INFO     | QA-Suite | user_action:150 | USER ACTION: entered_website_url | Context: {"url": "https://valueinsightpro.jumpiq.com/auth/login"}
+2025-06-24 00:15:02 | INFO     | QA-Suite | step:108 | STEP [1/7] Enter Website URL | Context: {"url": "https://valueinsightpro.jumpiq.com/auth/login"}
+2025-06-24 00:15:05 | INFO     | QA-Suite | user_action:150 | USER ACTION: uploaded_js_file | Context: {"filename": "jump_full_flow.js", "file_size": 10540}
+2025-06-24 00:15:05 | INFO     | QA-Suite | step:108 | STEP [2/7] Upload JS File | Context: {"filename": "jump_full_flow.js", "file_size": 10540}
+2025-06-24 00:15:12 | INFO     | QA-Suite | user_action:150 | USER ACTION: clicked_generate_test_ideas | Context: {"functionality": "For full flow"}
+2025-06-24 00:15:24 | INFO     | QA-Suite | api_call:124 | API POST /generate_test_ideas | Status: 200 | Time: 12.28s | Context: {"functionality": "For full flow", "js_content_length": 10540}
+2025-06-24 00:15:24 | INFO     | QA-Suite | performance:157 | PERFORMANCE test_ideas_generation_ui | Duration: 12.28s | Context: {"functionality": "For full flow", "test_ideas_count": 20}
+2025-06-24 00:15:24 | INFO     | QA-Suite | step:108 | STEP [3/7] Generate Test Ideas | Context: {"functionality": "For full flow", "test_ideas_count": 20}
+2025-06-24 00:15:26 | INFO     | QA-Suite | user_action:150 | USER ACTION: clicked_generate_full_flow_script
+2025-06-24 00:15:56 | INFO     | QA-Suite | api_call:124 | API POST /generate_full_flow_script | Status: 200 | Time: 29.75s | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login"}
+2025-06-24 00:15:56 | INFO     | QA-Suite | performance:157 | PERFORMANCE full_flow_script_generation_ui | Duration: 29.75s | Context: {"script_length": 9928}
+2025-06-24 00:15:56 | INFO     | QA-Suite | step:108 | STEP [4/7] Generate Full Flow Script | Context: {"script_length": 9928}
+2025-06-24 00:15:58 | INFO     | QA-Suite | user_action:150 | USER ACTION: clicked_run_script | Context: {"script_length": 9928}
+2025-06-24 00:16:51 | INFO     | QA-Suite | api_call:124 | API POST /run_script | Status: 200 | Time: 52.34s | Context: {"script_length": 9928}
+2025-06-24 00:16:51 | INFO     | QA-Suite | performance:157 | PERFORMANCE script_execution_ui | Duration: 52.34s | Context: {"script_length": 9928}
+2025-06-24 00:16:51 | INFO     | QA-Suite | step:108 | STEP [6/7] Run Tests | Context: {"logs_count": 1, "stats": {"failed": 1, "passed": 0, "success_rate": "0.0%", "total": 1}}
+2025-06-24 00:16:51 | INFO     | QA-Suite | user_action:150 | USER ACTION: downloaded_results | Context: {"script_length": 9928, "logs_count": 1}
+2025-06-24 00:16:51 | INFO     | QA-Suite | step:108 | STEP [7/7] Download Results | Context: {"script_length": 9928, "logs_count": 1}

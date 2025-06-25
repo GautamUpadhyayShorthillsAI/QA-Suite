@@ -8,15 +8,11 @@ import json
 import datetime
 import re
 import time
+import textwrap
 from utils.logger import (
     get_logger,
-    log_info,
-    log_error,
-    log_api_call,
-    log_performance,
-    log_file_operation,
-    log_test_result,
 )
+import ast  # Added for syntax validation of generated scripts
 
 # Initialize logger for backend
 logger = get_logger("Backend")
@@ -25,7 +21,7 @@ load_dotenv()
 
 # Log backend startup
 logger.info(
-    "Starting QA-Suite Backend",
+    "Starting QA-Suite Backend with Dynamic Self-Healing Engine",
     python_version=os.sys.version,
     flask_version="2.3.3",
     langchain_version="0.1.53",
@@ -33,18 +29,28 @@ logger.info(
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash-preview-05-20",
-    temperature=0.2,
+    temperature=0.1,  # Lower temperature for more predictable, stable code
     api_key=os.getenv("GOOGLE_API_KEY"),
 )
 
 logger.info(
     "LLM initialized",
     model="gemini-2.5-flash-preview-05-20",
-    temperature=0.2,
+    temperature=0.1,
     api_key_configured=bool(os.getenv("GOOGLE_API_KEY")),
 )
 
 app = Flask(__name__)
+
+# ---------------------------------------------------------------------------------
+# Configurable constants (can be overridden via environment variables)
+# ---------------------------------------------------------------------------------
+# Max number of test titles sent to the LLM in a single "slicer" request.
+BATCH_SIZE = int(os.getenv("SLICER_BATCH_SIZE", 4))
+
+# ---------------------------------------------------------------------------------
+# Utility helpers
+# ---------------------------------------------------------------------------------
 
 
 def clean_llm_output(text):
@@ -63,6 +69,220 @@ def clean_llm_output(text):
     return cleaned_text
 
 
+# ---------------------------------------------------------------------------------
+#   Lightweight Playwright-specific post-processing of LLM output
+# ---------------------------------------------------------------------------------
+
+
+def _fix_expect_page_url(script: str) -> str:
+    """Convert JS-style `expect(page.url).to_contain('foo')` to
+    Python-Playwright `expect(page).to_have_url(re.compile('foo'))`.
+    The replacement is intentionally naive but safe: it preserves the quoted
+    URL fragment and pre-pends `.*` so a plain substring match still works.
+    """
+
+    def _repl(match: re.Match) -> str:
+        url_fragment = match.group(1)
+        # keep original quotes – they are part of group(1)
+        return f"expect(page).to_have_url(re.compile({url_fragment}))"
+
+    pattern = r"expect\(page\.url\)\.to_contain\(([^)]+)\)"
+    return re.sub(pattern, _repl, script)
+
+
+def _ensure_page_param(script: str) -> str:
+    """Guarantee every test function declares a `page` parameter."""
+
+    def _repl(match: re.Match) -> str:
+        func_def = match.group(0)
+        # group(2) contains the parameter list; group(1) is the function name
+        params = match.group(2).strip()
+        if not params:
+            return func_def.replace("()", "(page)")
+        if "page" not in [p.strip() for p in params.split(",")]:
+            return func_def.replace("(", "(page, ", 1)
+        return func_def  # already fine
+
+    return re.sub(r"def (test_[\w_]+)\(([^)]*)\):", _repl, script)
+
+
+def sanitize_playwright_script(script: str) -> str:
+    """Apply quick, regex-based fixes for common LLM Playwright mistakes.
+
+    The function is intentionally *idempotent* – running it multiple times
+    yields the same string.  After sanitisation, syntax validity is checked
+    again in the calling context.
+    """
+
+    # ------------------------------------------------------------------
+    # 1. Remove accidental new-lines inside page.locator(...) calls
+    #    Example bad output:  page.locator('button\n', has_text="Sign In")
+    #    The fix:           -> page.locator('button', has_text="Sign In")
+    # ------------------------------------------------------------------
+
+    def _fix_multiline_locator(match: re.Match) -> str:
+        inner = match.group(1)
+        # Collapse any CR/LF characters that appear *inside* the parentheses
+        # but leave other whitespace intact to preserve readability.
+        cleaned = inner.replace("\n", "").replace("\r", "")
+        return f"locator({cleaned})"
+
+    script = re.sub(
+        r"locator\(([^)]*)\)", _fix_multiline_locator, script, flags=re.DOTALL
+    )
+
+    script = _fix_expect_page_url(script)
+    script = _ensure_page_param(script)
+    return script
+
+
+# ---------------------------------------------------------------------------------
+#   Helper to call the slicer LLM prompt in safe batches
+# ---------------------------------------------------------------------------------
+
+
+def build_sliced_tests_script(js_file_content: str, selected_tests: list[str]) -> str:
+    """Generate Playwright tests in batches to stay under the model token limit.
+
+    The first batch retains the imports/fixtures.  Subsequent batches strip all
+    leading lines until the first `def test_` so we do not duplicate global
+    code.  A blank line is inserted between batches for readability.
+    """
+
+    if not selected_tests:
+        return ""  # nothing to do
+
+    combined_script_parts: list[str] = []
+
+    for start in range(0, len(selected_tests), BATCH_SIZE):
+        batch = selected_tests[start : start + BATCH_SIZE]
+        prompt = get_specific_tests_prompt(js_file_content, batch)
+        response = llm.invoke(prompt)
+        raw_script = clean_llm_output(response.content)
+
+        # For second and later batches remove everything before first test def
+        if start != 0:
+            split_idx = re.search(r"^def test_", raw_script, re.MULTILINE)
+            if split_idx:
+                raw_script = raw_script[split_idx.start() :]
+        combined_script_parts.append(raw_script.strip())
+
+    return "\n\n".join(combined_script_parts)
+
+
+def get_specific_tests_prompt(
+    js_file_content, selected_tests, website_url="<website_url>", test_ideas=""
+):
+    selected_tests_json = json.dumps(selected_tests, indent=2)
+    return f"""
+You are a senior QA automation engineer. Generate a Playwright Python pytest script with the following STRICT requirements. Pay attention to the JS file comments; you may need to use the comments to handle edge cases, and make dedicated pytest functions to ensure a smooth flow of the test cases.
+
+1. **Imports and Fixtures:**  
+   Use these imports and fixtures exactly:
+   import pytest
+   from playwright.sync_api import sync_playwright, expect
+   from datetime import datetime
+
+   @pytest.fixture(scope="session")
+   def browser():
+       with sync_playwright() as p:
+           browser = p.chromium.launch(headless=False,slow_mo=1000)
+           yield browser
+           browser.close()
+
+   @pytest.fixture
+   def page(browser):
+       page = browser.new_page()
+       yield page
+       page.close()
+
+2. **Test Structure:**  
+   - Each test function (`def test_...`) must be fully self-contained.  
+   - Each test must start from `page.goto({website_url})` and perform all necessary steps (login, navigation, etc.) to reach the target functionality, using the actions and locators from the provided JS file.
+   - Do not share state between tests.
+
+**CRITICAL PLAYWRIGHT SYNTAX:** 
+   -Eg: 
+   - Viewport: `page.set_viewport_size({{"width": 1280, "height": 720}})` NOT `page.set_viewport_size(width=1280, height=720)`
+   - Wait for element: `page.wait_for_selector("selector")` NOT `page.wait_for_element("selector")`
+   - Fill input: `page.locator("input").fill("text")` NOT `page.locator("input").type("text")`
+   - Click and wait: `page.locator("button").click()` then `page.wait_for_load_state()`
+
+3. **Test Logic:**  
+   - For **positive** test cases:  
+     - After the final action, assert that the URL has changed (i.e., navigation occurred) using:
+       initial_url = page.url
+       # ... perform actions ...
+       with page.expect_navigation():
+           page.locator(...).click()
+       expect(page).not_to_have_url(initial_url)
+
+   - For **negative** login or form test cases (e.g., invalid form submission, invalid login):  
+     - First, check if the submit/next/login button is disabled:
+       submit_button = page.locator("...")
+       if submit_button.is_disabled():
+           expect(submit_button).to_be_disabled()
+       else:
+           initial_url = page.url
+           submit_button.click()
+           # After clicking, check that the URL did not change, the next expected element in the flow is NOT visible, and the current form fields/buttons are still visible:
+           expect(page).to_have_url(initial_url)
+           # Replace the selector below with the next expected element in the flow (e.g., dashboard, confirmation, or next form)
+           expect(page.locator("<next-element-selector>")).not_to_be_visible()
+           # Assert that the current form fields/buttons are still visible (replace selectors as per JS file)
+           expect(page.locator('[data-testid="username"]').to_be_visible()
+           expect(page.locator('[data-testid="password"]').to_be_visible()
+           expect(submit_button).to_be_visible()
+     - Do **not** use `expect()` on strings or HTML content.
+     - Do **not** check for specific error messages or invent selectors. Only check for error messages if a selector/class is provided in the JS file.
+     - Do **not** perform full DOM string comparisons.
+     - Use only locators and actions present in the JS file.
+
+   - **For form-related negative test cases:**
+     - When testing a negative scenario for a specific field (e.g., "age" is invalid), all other fields in the form must be filled with valid data as per the JS file. Only the field under test should be invalid or empty. Do not create negative tests where multiple fields are invalid unless that is a realistic user scenario.
+
+   - **For dropdowns, checkboxes, file uploads, search/filter, navigation, etc.:** (as previously described...)
+
+4. **Whole-Flow Testing (Incremental):**  
+   - When the user requests keywords like *"whole flow"*, *"entire web-flow"*, or leaves the functionality blank, break the JS journey into clearly marked **sections** using its comments.  
+   - Produce incremental tests: e.g., `Login only`, `Login + Form-1`, `Login + Form-1 + Form-2`, each set containing up to **5 tests**.  
+   - Re-use the same **setup code** for the prerequisite steps so that each test starts from the home page and reaches the required slice.
+
+5. **Verbatim-Flow / Sanity Test (Single):**  
+   - When the user says *"convert JS to pytest"*, *"run recorded JS flow"*, *"sanity"*, etc., create **exactly one** test function that reproduces the recorded JS actions **verbatim** (step-by-step, using only the actions and selectors from the JS file). Do **not** add intermediate assertions. Only add a single assertion at the end of the test, such as checking the final URL or that a final element (present at the end of the JS flow) is visible. Do not invent selectors or error messages.
+
+6. **Edge-Case Elements:**  
+   - If optional/pop-up UI elements (e.g., chat widgets) appear as indicated by JS comments, handle them gracefully (`if page.locator("text=Chat").is_visible(): ...`) but **do not** assert their presence or fail because of them.
+
+7. **Helper Functions (PROHIBITED):**  
+    - Each test must be *fully self-contained*.  
+    - Do **NOT** create or call helper/utility functions such as `_navigate_to_otp_screen` or `_login_to_otp_page`.  
+    - Duplicating setup steps inside every test is acceptable and preferred over sharing helpers.  
+
+8. **Test Naming:**  
+     - Name each test function clearly based on the test case description.
+
+9. **Variable Scope (STRICT):**  
+    - Do **NOT** introduce undeclared globals (e.g. `WEBSITE_URL`).  
+    - Define any constants (like the URL) *inside each test* or as a local variable at the top of the function.  
+
+10. **No Markdown or Explanations:**  
+     - Output only the raw Python code, no markdown fences or extra text.
+
+11. **Inputs:**  
+    - Website URL: {website_url}
+    - JS file actions (for setup and locators):  
+      ```javascript
+      {js_file_content}
+      ```
+    - Test cases to generate:  
+      {selected_tests_json}
+    - User request: {test_ideas}
+
+Follow these rules strictly. Do not invent selectors, URLs, or error messages. Use only what is present in the JS file and the test case descriptions.
+"""
+
+
 @app.route("/generate_test_ideas", methods=["POST"])
 def generate_test_ideas():
     start_time = time.time()
@@ -71,105 +291,55 @@ def generate_test_ideas():
         data = request.get_json()
         js_file_content = data.get("js_file_content", "")
         functionality = data.get("functionality", "")
-        logger.info(
-            "Processing test ideas request",
-            functionality=functionality,
-            js_content_length=len(js_file_content),
-            has_js_content=bool(js_file_content),
-        )
+
+        # ----------------------------------------------------------
+        # NEW: Dynamically determine how many ideas the user wants.
+        # If the *functionality* string contains a number (e.g. "Generate 5
+        # test cases for login"), we honour it.  Otherwise we default to 20 so
+        # existing behaviour is preserved.
+        # ----------------------------------------------------------
+        num_requested = 20  # sensible default
+        match = re.search(r"\b(\d+)\b", functionality)
+        if match:
+            try:
+                num_requested = max(1, int(match.group(1)))
+                logger.info(
+                    "User requested a specific number of test cases.",
+                    requested=num_requested,
+                )
+            except ValueError:
+                # Leave num_requested at default and log the parsing issue
+                logger.warning(
+                    "Could not parse requested number from functionality string – falling back to 20."
+                )
+
         prompt = f"""
-You are a QA expert. Based on this Playwright JS file and the '{functionality}' functionality, 
-generate exactly 20 test case titles in this STRICT JSON format in case there are more than 20 test cases for a particular functionality. 
-If the user explicitly asks for a specific number of test cases for a particular functionality, then only generate that number of test cases:
-Also finally as an example if a user specifies a particular functionality like form filling and validation , then only generate test cases for that functionality and keep the flow till that functionality same as the JS file 
-For eg: If i have asked you to test a particular form filling , but that form appears after Login , then till we reach that form or any other functionality on the website just go with the flow of the JS file and stop at that functionality and test that functionality with the required test cases 
-Eg 2: Now if a user wants to just test Login , then you just test the Login functionality and not move forward with any other functionality 
-
-{{
-    "test_ideas": [
-        "Test 1 description",
-        "Test 2 description",
-        ...
-    ]
-}}
-
+You are a QA expert. Based on this Playwright JS file and the '{functionality}' functionality,
+generate exactly {num_requested} test case titles in this STRICT JSON format.
 JS File:
 ```javascript
 {js_file_content}
-
-
-Guidelines for test ideas:
-
-Only generate test ideas that are relevant to the specified functionality and the actions in the JS file.
-
-Generate test cases for both the 'happy path' (successful submission) and 'negative paths' (e.g., submitting with each required field left empty one at a time).
-
-Do not generate test ideas that require verifying specific error messages unless a selector/class is provided.
-
-Focus on user flows, field validation, button state (enabled/disabled), and navigation.
-
-Avoid test ideas that require hardcoded error text or popups.
--Often there can be cases for example in a login page , if the user has kept an empty username or password
-then the Login/Submit button often does not work even after clicking it and as a consequence we don't shift to the next URL or page
-so we need to check for that and assert that the URL has not changed or check whether the Login/Submit button is disabled or not.
-This can be in the cases of forms as well where the user has not filled all the fields and the submit/Next button is disabled.
-
-Return ONLY the JSON object with the test_ideas array. No other text or explanation.
+```
+{{
+"test_ideas": [
+"Test 1 description",
+"Test 2 description",
+...
+]
+}}
+Return ONLY the JSON object.
 """
-        logger.info("Calling LLM for test ideas generation")
-        llm_start_time = time.time()
         response = llm.invoke(prompt)
-        llm_duration = time.time() - llm_start_time
-        logger.info(
-            "LLM response received",
-            response_length=len(response.content),
-            llm_duration=llm_duration,
-        )
         json_start = response.content.find("{")
         json_end = response.content.rfind("}") + 1
         if json_start == -1 or json_end == 0:
-            logger.error(
-                "No JSON found in LLM response", response_preview=response.content[:200]
-            )
-            return jsonify({"error": "Invalid JSON response from LLM"}), 500
+            raise ValueError("No JSON found in LLM response")
         json_str = response.content[json_start:json_end]
-        logger.debug(
-            "Extracted JSON from response",
-            json_length=len(json_str),
-            json_preview=json_str[:100],
-        )
         test_ideas = json.loads(json_str).get("test_ideas", [])
-        logger.info(
-            "Test ideas generated successfully",
-            test_ideas_count=len(test_ideas),
-            ideas_preview=test_ideas[:3] if test_ideas else [],
-        )
-        if len(test_ideas) < 20:
-            result = {"test_ideas": test_ideas}
-        else:
-            result = {"test_ideas": test_ideas[:20]}
-        total_duration = time.time() - start_time
-        log_performance(
-            "generate_test_ideas",
-            total_duration,
-            test_ideas_count=len(result["test_ideas"]),
-        )
+        result = {"test_ideas": test_ideas[:num_requested]}
         return jsonify(result)
-    except json.JSONDecodeError as e:
-        logger.error(
-            "JSON parsing error",
-            error=str(e),
-            response_preview=(
-                response.content[:200] if "response" in locals() else "No response"
-            ),
-        )
-        return jsonify({"error": f"Failed to parse test ideas: {str(e)}"}), 500
     except Exception as e:
-        logger.error(
-            "Unexpected error in generate_test_ideas",
-            error=str(e),
-            error_type=type(e).__name__,
-        )
+        logger.error("Error in generate_test_ideas", error=str(e), exc_info=True)
         return jsonify({"error": f"Failed to generate test ideas: {str(e)}"}), 500
 
 
@@ -181,114 +351,244 @@ def generate_script():
         data = request.get_json()
         js_file_content = data.get("js_file_content", "")
         selected_tests = data.get("selected_tests", [])
-        website_url = data.get("website_url", "")
-        logger.info(
-            "Processing script generation request",
-            website_url=website_url,
-            selected_tests_count=len(selected_tests),
-            js_content_length=len(js_file_content),
-            selected_tests_preview=selected_tests[:3] if selected_tests else [],
-        )
-        prompt = f"""Generate a Python Playwright pytest script with these STRICT requirements:
-IMPORTS (must include exactly):
-import pytest
-import re
-from playwright.sync_api import sync_playwright, expect
-from datetime import datetime
-FIXTURES (must include exactly):
-@pytest.fixture(scope=\"session\")
-def browser():
-    with sync_playwright() as p:
-        # IMPORTANT: Always launch with slow_mo=500 (or higher if needed for reliability)
-        browser = p.chromium.launch(headless=False, slow_mo=500)
-        yield browser
-        browser.close()
-@pytest.fixture
-def page(browser):
-    page = browser.new_page()
-    yield page
-    page.close()
-TEST STRUCTURE (each test must follow these rules):
-Use explicit locators from the recorded JS file for all actions (clicks, fills, etc.). Do not invent locators.
-NEW RULE: When identifying elements, strongly prefer robust selectors like data-testid, id, or page.get_by_role('button', name='...'). If the recorded JS file only provides a generic CSS class selector (e.g., .h-9, .btn), add a comment in the generated code: # WARNING: The following selector is generic and may be unreliable.
-NEW RULE: Do not make assumptions about element states like 'disabled' or 'read-only' unless the recorded JS file provides a direct basis for it. Prioritize asserting visibility and value over behavioral states you have to guess.
-Every call to set_viewport_size must be of the form page.set_viewport_size({{"width": <int>, "height": <int>}})
-Never use a selector string that contains unbalanced quotes (run " and ' counts must both be even). Reject the generation if this rule is broken.
+        # --- Robust generation using batching & sanitisation ---
+        script = build_sliced_tests_script(js_file_content, selected_tests)
 
-# NEW RULES FOR RELIABILITY:
-# 1. After every page.goto(...), IMMEDIATELY call page.wait_for_load_state('networkidle') to ensure the page is fully loaded before interacting with selectors.
-# 2. After every click that is expected to cause navigation (e.g., login, submit, next), IMMEDIATELY call page.wait_for_load_state('networkidle') before proceeding to the next step.
-# 3. Use slow_mo in browser launch as above to make all actions slower and more reliable for selector detection.
+        script = sanitize_playwright_script(script)
 
-For POSITIVE test cases (e.g., successful login, valid submission):
-UPDATED RULE: When asserting a successful navigation, the most reliable method is to expect a unique and stable element on the new page to be visible. Use URL checks as a secondary confirmation. Do not guess new URLs.
-Only perform actions and assertions that are present in the recorded JS file.
-For NEGATIVE test cases (e.g., submitting an invalid form, missing required fields):
-First, check if the submit/next/login button is disabled when required fields are empty or invalid. If so, assert that the button is disabled and do not attempt to click it.
-If the button is enabled and clicked, check that the URL does not change (i.e., the user is not navigated away).
-Only check for error messages if a specific selector or class is provided (e.g., '.text-destructive'). Never invent error text or popups.
-Note: Websites may use inline error messages, disabled buttons, or other UI patterns to indicate errors. Adapt the test logic accordingly and avoid hallucinating UI elements or behaviors.
-Also finally if For eg: If i have asked you to test a particular form filling , but that form appears after Login , then till we reach that form or any other functionality on the website just go with the flow of the JS file
-and stop at that functionality and test that functionality with the required test cases , once executed the test case , then continue with the other test cases and go with a similar flow as the JS file
-Eg 2: Now if a user wants to just test Login , then you just test the Login functionality and not move forward with any other functionality
-For website: {website_url}
-Based on these recorded actions:
-{js_file_content}
-Generate tests for:
-{selected_tests}
-Output ONLY the raw Python code
-"""
-        logger.info("Calling LLM for script generation")
-        llm_start_time = time.time()
-        response = llm.invoke(prompt)
-        llm_duration = time.time() - llm_start_time
-        logger.info(
-            "LLM response received for script generation",
-            response_length=len(response.content),
-            llm_duration=llm_duration,
-        )
-        script = clean_llm_output(response.content)
-        logger.debug(
-            "Script generated", script_length=len(script), script_preview=script[:200]
-        )
-        required = [
-            "@pytest.fixture",
-            "def page(",
-            "def browser(",
-            "import pytest",
-            "import re",
-            "from playwright.sync_api import sync_playwright, expect",
-            "from datetime import datetime",
-        ]
-        missing_requirements = [req for req in required if req not in script]
-        if missing_requirements:
-            logger.error(
-                "Generated script missing required components",
-                missing_requirements=missing_requirements,
-                script_preview=script[:500],
+        # Validate LLM output before returning it to the caller
+        if not is_valid_python(script):
+            return (
+                jsonify(
+                    {
+                        "error": "SyntaxError",
+                        "details": "AI-generated script contains invalid Python syntax. Please retry generation.",
+                    }
+                ),
+                500,
             )
-            raise ValueError(
-                f"Generated script missing required fixtures or imports: {missing_requirements}"
-            )
-        logger.info(
-            "Script validation passed",
-            script_length=len(script),
-            has_fixtures=True,
-            has_imports=True,
-        )
-        total_duration = time.time() - start_time
-        log_performance(
-            "generate_script",
-            total_duration,
-            script_length=len(script),
-            tests_count=len(selected_tests),
-        )
+
         return jsonify({"script": script})
     except Exception as e:
-        logger.error(
-            "Error in generate_script", error=str(e), error_type=type(e).__name__
-        )
+        logger.error("Error in generate_script", error=str(e), exc_info=True)
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/generate_full_flow_script", methods=["POST"])
+def generate_full_flow_script():
+    start_time = time.time()
+    logger.info("Received full flow script generation request")
+    try:
+        data = request.get_json()
+        js_file_content = data.get("js_file_content", "")
+        task_instructions = (
+            "Generate a complete flow test named `test_complete_end_to_end_workflow`."
+        )
+        prompt = get_specific_tests_prompt(js_file_content, [])
+        response = llm.invoke(prompt)
+        script = clean_llm_output(response.content)
+
+        # Validate syntax of the full-flow script as well
+        if not is_valid_python(script):
+            return (
+                jsonify(
+                    {
+                        "error": "SyntaxError",
+                        "details": "AI-generated script contains invalid Python syntax. Please retry generation.",
+                    }
+                ),
+                500,
+            )
+
+        return jsonify({"script": script})
+    except Exception as e:
+        logger.error("Error in generate_full_flow_script", error=str(e), exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+# --- SELF-HEALING ENGINE COMPONENTS ---
+
+
+def get_ai_fix_for_selector(
+    failing_command: str, user_intent: str, dom_content: str, error_message: str
+):
+    """Asks the LLM to provide a fix for a failing Playwright command."""
+    logger.info("Attempting AI self-healing for a failing selector.")
+    prompt = f"""You are an expert Playwright test automation engineer. A test script has failed with a timeout error. Analyze the situation and provide a more robust selector to fix the script.
+
+Context of Failure:
+
+User's Original Intent (from JS comments):
+"{user_intent}"
+
+The Python Command That FAILED:
+{failing_command}
+
+The Error Message:
+{error_message}
+
+The Full HTML DOM of the page at the moment of failure:
+```html
+{dom_content}
+```
+
+Your Task:
+Based on the user's intent and the provided DOM, generate a corrected, more robust Playwright command.
+
+Rules for the New Command:
+
+PRIORITIZE user-facing locators: page.get_by_role(), page.get_by_text(), page.get_by_label(), page.get_by_placeholder(), page.get_by_test_id().
+
+AVOID brittle, style-based selectors like .ant-btn or complex CSS paths.
+
+IF the error message contains "strict mode violation" (multiple elements matched), RETURN a selector guaranteed to match exactly ONE element (e.g., append `.first`, `.nth(0)`, add a `has=` filter, etc.).
+
+The output must be a single line of Python code.
+
+Output Format:
+Return ONLY a JSON object in the following format. Do not include any other text or explanations.
+
+{{
+  "fixed_command": "page.get_by_role('button', name='Verify').click()"
+}}
+"""
+    try:
+        response = llm.invoke(prompt)
+        content = response.content
+        json_start = content.find("{")
+        json_end = content.rfind("}") + 1
+        if json_start == -1 or json_end == 0:
+            return None
+        json_str = content[json_start:json_end]
+        parsed_response = json.loads(json_str)
+        logger.info(
+            "AI self-healing provided a potential fix.",
+            fix=parsed_response.get("fixed_command"),
+        )
+        return parsed_response
+    except Exception as e:
+        logger.error(f"An exception occurred during AI self-healing: {e}")
+        return None
+
+
+def add_dom_dumping_to_script(script_content: str, dom_dump_path: str):
+    """Injects a try/except wrapper into every `test_*` function so the DOM is
+    automatically dumped when an exception is raised.  Works with *multiple*
+    test functions and preserves original indentation, preventing the
+    `IndentationError` that occurred previously.
+
+    Args:
+        script_content: The raw python test script.
+        dom_dump_path: Where to save the DOM when a test fails.
+    Returns:
+        The augmented script content.
+    """
+
+    logger.info("Enhancing test script with automatic DOM dumping on failure.")
+
+    # Collect every test function definition – we need indices to perform string surgery
+    test_func_matches = list(re.finditer(r"def (test_\w+)\(page\):", script_content))
+    if not test_func_matches:
+        return script_content  # Nothing to enhance
+
+    escaped_dom_path = dom_dump_path.replace("\\", "\\\\")
+
+    # Work *backwards* through the script so index calculations remain valid
+    for func_match in reversed(test_func_matches):
+        func_name = func_match.group(1)
+        header_end = func_match.end()  # position right after "):" of def line
+
+        # Determine the indentation used inside this function (first indented line)
+        indent_match = re.search(r"\n(\s+)", script_content[header_end:])
+        if not indent_match:
+            # No indented body – skip (one-liner or malformed)
+            continue
+        base_indent = indent_match.group(1)
+
+        body_start_idx = header_end + indent_match.end()  # start of first statement
+
+        # Find where this function body ends by scanning until indentation falls back
+        remainder = script_content[body_start_idx:]
+        lines = remainder.split("\n")
+        cumulative_len = 0
+        body_end_offset = len(remainder)  # default to end of file
+        for i, line in enumerate(lines[1:], 1):  # skip first line, already inside body
+            if line.strip() == "":
+                cumulative_len += len(line) + 1
+                continue
+            if not line.startswith(base_indent):
+                body_end_offset = cumulative_len
+                break
+            cumulative_len += len(line) + 1
+
+        original_body = remainder[:body_end_offset]
+
+        # Re-indent body 1 extra level under try block
+        indented_body = textwrap.indent(original_body.rstrip("\n"), "    ")
+
+        wrapper = (
+            f"\n{base_indent}try:\n"
+            f"{indented_body}\n"
+            f"{base_indent}except Exception as e:\n"
+            f'{base_indent}    print(f"ERROR in {func_name}: Dumping DOM for analysis.")\n'
+            f"{base_indent}    try:\n"
+            f"{base_indent}        with open(r'{escaped_dom_path}', 'w', encoding='utf-8') as f:\n"
+            f"{base_indent}            f.write(page.content())\n"
+            f'{base_indent}        print(f"DOM content successfully dumped to {escaped_dom_path}")\n'
+            f"{base_indent}    except Exception as dump_error:\n"
+            f'{base_indent}        print(f"CRITICAL: Failed to dump DOM: {{dump_error}}")\n'
+            f"{base_indent}    raise e\n"
+        )
+
+        # Replace the original body with the wrapped version
+        script_content = (
+            script_content[:body_start_idx] + wrapper + remainder[body_end_offset:]
+        )
+
+    return script_content
+
+
+def extract_failing_context(traceback: str, original_script: str):
+    """Parses the traceback to find the failing line and its preceding comment."""
+    # This regex is more robust for finding the failing line in the test script
+    matches = list(
+        re.findall(
+            r'File ".*test_script.py", line \d+, in .*\n\s*(page..*)',
+            traceback,
+        )
+    )
+    # Fallback: look for the pytest short-form "test_script.py:123:" lines
+    if not matches:
+        matches = list(
+            re.findall(
+                r"test_script.py:\d+:.*\n\s*(page..*)",
+                traceback,
+            )
+        )
+    if not matches:
+        logger.error(
+            "Could not parse failing command from traceback.",
+            traceback_preview=traceback[-1000:],
+        )
+        return None, "No specific user intent comment found."
+    # The last match in the list is the one that directly caused the error
+    failing_command = matches[-1].strip()
+    script_lines = original_script.split("\n")
+    user_intent = "Perform the action: " + failing_command
+    for i, line in enumerate(script_lines):
+        if line.strip() == failing_command:
+            # Look backwards for the first comment
+            for j in range(i - 1, -1, -1):
+                if script_lines[j].strip().startswith("#"):
+                    user_intent = script_lines[j].strip().lstrip("# ").strip()
+                    break
+            break
+    logger.info(
+        "Extracted context for self-healing.",
+        failing_command=failing_command,
+        user_intent=user_intent,
+    )
+    return failing_command, user_intent
 
 
 @app.route("/run_script", methods=["POST"])
@@ -298,210 +598,245 @@ def run_script():
     try:
         data = request.get_json()
         script_content = data.get("script_content", "")
-        logger.info(
-            "Processing script execution",
-            script_length=len(script_content),
-            script_preview=script_content[:200],
-        )
+        execution_mode = data.get("execution_mode", "specific_tests")
+
+        # If we are *not* in full_flow mode, run once without healing
+        if execution_mode != "full_flow":
+            logger.info("Running script in STANDARD mode (strict, no self-healing).")
+            standard_result = run_standard_test(script_content)
+            return jsonify(standard_result)
+
         with tempfile.TemporaryDirectory() as temp_dir:
             script_path = os.path.join(temp_dir, "test_script.py")
             report_path = os.path.join(temp_dir, "report.json")
-            detailed_log_path = os.path.join(temp_dir, "detailed_log.txt")
-            logger.info(
-                "Created temporary directory",
-                temp_dir=temp_dir,
-                script_path=script_path,
-                report_path=report_path,
-            )
+            dom_dump_path = os.path.join(temp_dir, "dom_on_failure.html")
+            healing_attempts = []  # Only populated for self-healing/full-flow mode
+
+            # --- Retry strategy: manual attempts first, followed by AI-healing retries ---
             try:
+                manual_retries = int(data.get("manual_retries", 1))
+            except (TypeError, ValueError):
+                manual_retries = 1
+
+            try:
+                max_healing_retries = int(data.get("max_healing_retries", 2))
+            except (TypeError, ValueError):
+                max_healing_retries = 2
+
+            manual_wait = float(data.get("manual_wait", 10))  # seconds
+
+            total_attempts = 1 + manual_retries + max_healing_retries
+
+            for attempt in range(total_attempts):
+                logger.info(
+                    f"Starting execution attempt {attempt + 1}/{total_attempts}"
+                )
+                enhanced_script = add_dom_dumping_to_script(
+                    script_content, dom_dump_path
+                )
                 with open(script_path, "w") as f:
-                    f.write(script_content)
-                log_file_operation(
-                    "write", script_path, True, content_length=len(script_content)
-                )
-            except Exception as e:
-                logger.error(
-                    "Failed to write script file", error=str(e), script_path=script_path
-                )
-                return jsonify({"error": f"Failed to write script: {str(e)}"}), 500
-            try:
+                    f.write(enhanced_script)
+                # Use verbose mode (-v) so pytest prints a line per test.  This allows our
+                # fallback log parser (when the json-report plugin fails to create a
+                # report file) to reliably extract per-test outcomes.
                 cmd = [
                     "pytest",
+                    "-v",
                     script_path,
-                    "--json-report",
                     f"--json-report-file={report_path}",
                     "--capture=no",
-                    "-v",
-                    "--tb=long",
-                    f"--log-file={detailed_log_path}",
-                    "--log-file-level=DEBUG",
-                    "--log-cli-level=DEBUG",
                 ]
-                logger.info(
-                    "Executing pytest command",
-                    command=" ".join(cmd),
-                    working_dir=temp_dir,
-                )
-                execution_start = time.time()
                 result = subprocess.run(
-                    cmd, check=False, cwd=temp_dir, capture_output=True, text=True
+                    cmd, cwd=temp_dir, capture_output=True, text=True
                 )
-                execution_duration = time.time() - execution_start
-                logger.info(
-                    "Pytest execution completed",
-                    return_code=result.returncode,
-                    execution_duration=execution_duration,
-                    stdout_length=len(result.stdout),
-                    stderr_length=len(result.stderr),
-                )
-                if result.stdout:
-                    logger.debug("Pytest stdout output", stdout=result.stdout[:1000])
-                if result.stderr:
-                    logger.warning("Pytest stderr output", stderr=result.stderr[:1000])
-                if not os.path.exists(report_path):
-                    logger.error(
-                        "No report file generated",
-                        report_path=report_path,
-                        temp_dir_contents=os.listdir(temp_dir),
+                if result.returncode == 0:
+                    logger.info(
+                        f"Script executed successfully on attempt {attempt + 1}."
                     )
-                    return (
-                        jsonify(
-                            {
-                                "error": "Test execution failed",
-                                "details": "No report generated - possible syntax error",
-                                "stdout": result.stdout[:500] if result.stdout else "",
-                                "stderr": result.stderr[:500] if result.stderr else "",
-                            }
-                        ),
-                        400,
+                    break
+                if attempt >= (manual_retries + max_healing_retries):
+                    logger.error("Max retries reached. Aborting.")
+                    break
+                logger.warning(f"Script failed on attempt {attempt + 1}.")
+                traceback = result.stdout + result.stderr
+                # Manual retry phase: attempt < manual_retries
+                if attempt < manual_retries:
+                    logger.info(
+                        f"This was a manual retry ({attempt + 1}/{manual_retries}). Retrying the same script after {manual_wait}s."
                     )
-                try:
-                    with open(report_path) as f:
-                        report = json.load(f)
-                    log_file_operation("read", report_path, True)
-                except Exception as e:
-                    logger.error(
-                        "Failed to read report file",
-                        error=str(e),
-                        report_path=report_path,
+                    time.sleep(max(manual_wait, 0))
+                    continue
+                traceback_lower = traceback.lower()
+                if (
+                    "timeouterror" in traceback_lower
+                    or "locator expected to be visible" in traceback_lower
+                    or "strict mode violation" in traceback_lower
+                    or "strict mode error" in traceback_lower
+                    or "attributeerror" in traceback_lower
+                    or "nameerror" in traceback_lower
+                    or "assertionerror" in traceback_lower
+                ):
+                    failing_command, user_intent = extract_failing_context(
+                        traceback, script_content
                     )
-                    return jsonify({"error": f"Failed to read report: {str(e)}"}), 500
-                logs = []
-                passed_tests = 0
-                failed_tests = 0
-                total_tests = 0
-                detailed_failures = []
-                for test in report.get("tests", []):
-                    total_tests += 1
-                    test_name = test.get("nodeid", "Unknown Test")
-                    outcome = test.get("outcome", "error")
-                    duration = test.get("duration", 0)
-                    log_result = ""
-                    failure_details = None
-                    if outcome == "passed":
-                        passed_tests += 1
-                        log_result = "Passed"
-                    else:
-                        failed_tests += 1
-                        failure_details = {
-                            "test_name": test_name,
-                            "outcome": outcome,
-                            "duration": duration,
-                            "error_message": "",
-                            "traceback": "",
-                            "stdout": "",
-                            "stderr": "",
-                        }
-                        if outcome == "failed":
-                            log_result = "Failed"
-                            failure_details["failure_type"] = "Assertion Failure"
-                        else:
-                            log_result = "Error"
-                            failure_details["failure_type"] = "Environment/Setup Error"
-                        failure_info = (
-                            test.get("call")
-                            or test.get("setup")
-                            or test.get("teardown")
+                    if not failing_command:
+                        logger.error(
+                            "Could not parse failing command from traceback. Aborting self-heal."
                         )
-                        if failure_info:
-                            if "longrepr" in failure_info:
-                                failure_details["error_message"] = failure_info[
-                                    "longrepr"
-                                ]
-                            if "stdout" in failure_info:
-                                failure_details["stdout"] = failure_info["stdout"]
-                            if "stderr" in failure_info:
-                                failure_details["stderr"] = failure_info["stderr"]
-                            if "traceback" in failure_info:
-                                failure_details["traceback"] = failure_info["traceback"]
-                        detailed_failures.append(failure_details)
-                    logs.append(
+                        break
+                    dom_content = ""
+                    if os.path.exists(dom_dump_path):
+                        with open(dom_dump_path, "r", encoding="utf-8") as f:
+                            dom_content = f.read()
+                    if not dom_content:
+                        logger.error(
+                            "DOM dump file not found or empty. Aborting self-heal."
+                        )
+                        break
+                    ai_fix = get_ai_fix_for_selector(
+                        failing_command, user_intent, dom_content, traceback
+                    )
+                    if ai_fix and ai_fix.get("fixed_command"):
+                        fixed_command = ai_fix["fixed_command"]
+                        logger.info(
+                            f"AI suggested fix: Replacing '{failing_command}' with '{fixed_command}'"
+                        )
+                        healing_attempts.append(
+                            {
+                                "attempt": attempt + 1,
+                                "failing_command": failing_command,
+                                "fixed_command": fixed_command,
+                                "user_intent": user_intent,
+                            }
+                        )
+                        script_content = script_content.replace(
+                            failing_command, fixed_command, 1
+                        )
+                        continue
+                    else:
+                        logger.error(
+                            "AI self-healing did not provide a valid fix. Aborting."
+                        )
+                        break
+                else:
+                    logger.warning(
+                        "Failure was not a selector timeout. Aborting self-healing."
+                    )
+                    break
+            # --- Final Reporting ---
+            if not os.path.exists(report_path):
+                if result.returncode == 0:
+                    # -------------------------------------------------------------
+                    # NEW: Parse pytest stdout to extract per-test results so we can
+                    # still report accurate statistics even when the json-report
+                    # plugin is missing.  We look for lines of the form:
+                    #   test_script.py::test_name PASSED [ 20% ]
+                    # and build a list of logs accordingly.  ANSI colour escape
+                    # sequences are stripped prior to regex matching.
+                    # -------------------------------------------------------------
+
+                    # Helper – strip ANSI sequences for clean parsing
+                    ansi_escape = re.compile(r"\x1b\[[0-9;]*[mK]")
+                    stdout_clean = ansi_escape.sub("", result.stdout)
+
+                    per_test_pattern = re.compile(
+                        r"^(.*?::[\w\[\]-]+)\s+(PASSED|FAILED|ERROR|SKIPPED|XPASS|XFAIL)",
+                        re.MULTILINE,
+                    )
+
+                    logs_list = []
+                    for match in per_test_pattern.finditer(stdout_clean):
+                        nodeid = match.group(1).strip()
+                        outcome = match.group(2).capitalize()
+                        logs_list.append(
+                            {
+                                "timestamp": datetime.datetime.now().isoformat(
+                                    timespec="seconds"
+                                ),
+                                "action": nodeid,
+                                "result": outcome,
+                                "duration": "-",
+                            }
+                        )
+
+                    if logs_list:
+                        total = len(logs_list)
+                        passed = len([l for l in logs_list if l["result"] == "Passed"])
+                        failed = total - passed
+
+                        summary = {
+                            "total": total,
+                            "passed": passed,
+                            "failed": failed,
+                            "errors": 0,
+                        }
+                        stats_obj = {"total": total, "passed": passed, "failed": failed}
+                    else:
+                        # Fallback to single-entry dummy summary if parsing failed
+                        summary = {
+                            "total": 1,
+                            "passed": int(result.returncode == 0),
+                            "failed": int(result.returncode != 0),
+                            "errors": 0,
+                        }
+                        stats_obj = {
+                            "total": summary["total"],
+                            "passed": summary["passed"],
+                            "failed": summary["failed"],
+                        }
+
+                    minimal_report = {"summary": summary}
+
+                    # If we have no logs from parsing, create at least suite-level one
+                    if not logs_list:
+                        logs_list = [
+                            {
+                                "timestamp": datetime.datetime.now().isoformat(
+                                    timespec="seconds"
+                                ),
+                                "action": "Test Suite",
+                                "result": (
+                                    "Passed" if summary["failed"] == 0 else "Failed"
+                                ),
+                                "duration": "0s",
+                            }
+                        ]
+
+                    return jsonify(
                         {
-                            "timestamp": datetime.datetime.now().strftime(
-                                "%Y-%m-%d %H:%M:%S"
-                            ),
-                            "action": test_name,
-                            "result": log_result,
-                            "duration": f"{duration:.2f}s",
-                            "details": failure_details,
+                            "report": minimal_report,
+                            "healing_attempts": healing_attempts,
+                            "logs": logs_list,
+                            "stats": stats_obj,
+                            "final_stdout": result.stdout,
+                            "final_stderr": result.stderr,
                         }
                     )
-                    log_test_result(test_name, outcome, duration=duration)
-                stats = {
-                    "passed": passed_tests,
-                    "failed": failed_tests,
-                    "total": total_tests,
-                    "success_rate": (
-                        f"{(passed_tests/total_tests*100):.1f}%"
-                        if total_tests > 0
-                        else "0%"
-                    ),
-                }
-                logger.info(
-                    "Test execution results compiled",
-                    total_tests=total_tests,
-                    passed_tests=passed_tests,
-                    failed_tests=failed_tests,
-                    logs_count=len(logs),
-                    detailed_failures_count=len(detailed_failures),
-                )
-                total_duration = time.time() - start_time
-                log_performance(
-                    "run_script",
-                    total_duration,
-                    total_tests=total_tests,
-                    passed_tests=passed_tests,
-                    failed_tests=failed_tests,
-                )
-                return jsonify(
-                    {
-                        "logs": logs,
-                        "stats": stats,
-                        "detailed_failures": detailed_failures,
-                        "execution_summary": {
-                            "total_duration": f"{total_duration:.2f}s",
-                            "pytest_return_code": result.returncode,
-                            "stdout_preview": (
-                                result.stdout[:500] if result.stdout else ""
-                            ),
-                            "stderr_preview": (
-                                result.stderr[:500] if result.stderr else ""
-                            ),
-                        },
-                    }
-                )
-            except Exception as e:
-                logger.error(
-                    "Test execution failed", error=str(e), error_type=type(e).__name__
-                )
+                # Otherwise return error as before
                 return (
-                    jsonify({"error": "Test execution failed", "details": str(e)}),
-                    500,
+                    jsonify(
+                        {
+                            "error": "Test execution failed",
+                            "details": "No report generated.",
+                            "stdout": result.stdout,
+                            "stderr": result.stderr,
+                            "healing_attempts": healing_attempts,
+                        }
+                    ),
+                    400,
                 )
+            with open(report_path) as f:
+                report = json.load(f)
+            return jsonify(
+                {
+                    "report": report,
+                    "healing_attempts": healing_attempts,
+                    "final_stdout": result.stdout,
+                    "final_stderr": result.stderr,
+                }
+            )
     except Exception as e:
-        logger.error(
-            "Unexpected error in run_script", error=str(e), error_type=type(e).__name__
-        )
+        logger.error("Unexpected error in run_script", error=str(e), exc_info=True)
         return jsonify({"error": "Script execution failed", "details": str(e)}), 500
 
 
@@ -513,7 +848,7 @@ def health_check():
         {
             "status": "healthy",
             "timestamp": datetime.datetime.now().isoformat(),
-            "version": "1.0.0",
+            "version": "3.0.0-healing-engine",
         }
     )
 
@@ -567,7 +902,6 @@ def get_specific_log(filename):
     try:
         logs_dir = "./logs"
         log_file_path = os.path.join(logs_dir, filename)
-        # Security check - ensure file is within logs directory
         if not os.path.abspath(log_file_path).startswith(os.path.abspath(logs_dir)):
             return jsonify({"error": "Access denied"}), 403
         if os.path.exists(log_file_path):
@@ -621,8 +955,231 @@ def list_logs():
         return jsonify({"error": f"Failed to list logs: {str(e)}"}), 500
 
 
+# ---------------------------------------------------------------------------
+# New utility: quick syntax validation for generated Python scripts
+# ---------------------------------------------------------------------------
+
+
+def is_valid_python(code: str) -> bool:
+    """Return True if *code* parses as valid Python, else False.
+
+    The check is intentionally lightweight – we use the built-in *ast* module
+    so no external dependencies are introduced.  Detailed error information is
+    logged to help diagnose LLM output issues.
+    """
+    try:
+        ast.parse(code)
+        return True
+    except SyntaxError as e:
+        logger.error(
+            "Generated script failed basic syntax validation",
+            error=str(e),
+            lineno=getattr(e, "lineno", None),
+            text=getattr(e, "text", "")[:120].strip(),
+        )
+        return False
+
+
+# ---------------------------------------------------------------------------
+#   Simple runner for STRICT mode (no retries, no healing)
+# ---------------------------------------------------------------------------
+
+
+def run_standard_test(script_content: str):
+    """Execute *script_content* once via pytest without any retry/healing.
+
+    Returns a python dict compatible with the self-healing runner so the
+    frontend UI can handle the response uniformly.
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        script_path = os.path.join(temp_dir, "test_script.py")
+        report_path = os.path.join(temp_dir, "report.json")
+
+        # Write the provided script to disk
+        with open(script_path, "w", encoding="utf-8") as f:
+            f.write(script_content)
+
+        # Run in verbose mode so each test outcome is clearly printed –
+        # necessary for the stdout-based fallback parser.
+        cmd = [
+            "pytest",
+            "-v",
+            script_path,
+            f"--json-report-file={report_path}",
+            "--capture=no",
+        ]
+        result = subprocess.run(cmd, cwd=temp_dir, capture_output=True, text=True)
+
+        # If pytest did not create the report file we fabricate a minimal one so
+        # the frontend UI still has stats and logs to work with.
+        if not os.path.exists(report_path):
+            # -------------------------------------------------------------
+            # NEW: Parse pytest stdout to extract per-test results so we can
+            # still report accurate statistics even when the json-report
+            # plugin is missing.  We look for lines of the form:
+            #   test_script.py::test_name PASSED [ 20% ]
+            # and build a list of logs accordingly.  ANSI colour escape
+            # sequences are stripped prior to regex matching.
+            # -------------------------------------------------------------
+
+            # Helper – strip ANSI sequences for clean parsing
+            ansi_escape = re.compile(r"\x1b\[[0-9;]*[mK]")
+            stdout_clean = ansi_escape.sub("", result.stdout)
+
+            per_test_pattern = re.compile(
+                r"^(.*?::[\w\[\]-]+)\s+(PASSED|FAILED|ERROR|SKIPPED|XPASS|XFAIL)",
+                re.MULTILINE,
+            )
+
+            logs_list = []
+            for match in per_test_pattern.finditer(stdout_clean):
+                nodeid = match.group(1).strip()
+                outcome = match.group(2).capitalize()
+                logs_list.append(
+                    {
+                        "timestamp": datetime.datetime.now().isoformat(
+                            timespec="seconds"
+                        ),
+                        "action": nodeid,
+                        "result": outcome,
+                        "duration": "-",
+                    }
+                )
+
+            if logs_list:
+                total = len(logs_list)
+                passed = len([l for l in logs_list if l["result"] == "Passed"])
+                failed = total - passed
+
+                summary = {
+                    "total": total,
+                    "passed": passed,
+                    "failed": failed,
+                    "errors": 0,
+                }
+                stats_obj = {"total": total, "passed": passed, "failed": failed}
+            else:
+                # Fallback to single-entry dummy summary if parsing failed
+                summary = {
+                    "total": 1,
+                    "passed": int(result.returncode == 0),
+                    "failed": int(result.returncode != 0),
+                    "errors": 0,
+                }
+                stats_obj = {
+                    "total": summary["total"],
+                    "passed": summary["passed"],
+                    "failed": summary["failed"],
+                }
+
+            minimal_report = {"summary": summary}
+
+            # If we have no logs from parsing, create at least suite-level one
+            if not logs_list:
+                logs_list = [
+                    {
+                        "timestamp": datetime.datetime.now().isoformat(
+                            timespec="seconds"
+                        ),
+                        "action": "Test Suite",
+                        "result": ("Passed" if summary["failed"] == 0 else "Failed"),
+                        "duration": "0s",
+                    }
+                ]
+
+            return {
+                "report": minimal_report,
+                "healing_attempts": [],
+                "logs": logs_list,
+                "stats": stats_obj,
+                "final_stdout": result.stdout,
+                "final_stderr": result.stderr,
+            }
+
+        with open(report_path) as f:
+            report = json.load(f)
+
+        # -----------------------
+        # Build stats & logs back for the UI
+        # -----------------------
+        summary = report.get("summary", {})
+        stats_obj = {
+            "total": summary.get("total", 0),
+            "passed": summary.get("passed", 0),
+            "failed": summary.get("failed", 0) + summary.get("errors", 0),
+        }
+
+        logs_list = []
+        for test in report.get("tests", []):
+            logs_list.append(
+                {
+                    "timestamp": datetime.datetime.now().isoformat(timespec="seconds"),
+                    "action": test.get("nodeid", "test"),
+                    "result": test.get("outcome", "unknown").capitalize(),
+                    "duration": f"{test.get('duration', 0):.2f}s",
+                }
+            )
+
+        # Fallback: some pytest-json-report versions omit the per-test list. Extract from stdout.
+        if not logs_list:
+            # Strip ANSI colour codes for easier parsing
+            ansi_escape = re.compile(r"\x1b\[[0-9;]*[mK]")
+            stdout_clean = ansi_escape.sub("", result.stdout)
+
+            # Typical line:  test_script.py::test_name PASSED [ 10% ]
+            pattern = re.compile(
+                r"^(.*?::[\w\[\]-]+)\s+(PASSED|FAILED|ERROR|SKIPPED|XPASS|XFAIL)",
+                re.MULTILINE,
+            )
+
+            for match in pattern.finditer(stdout_clean):
+                nodeid = match.group(1).strip()
+                outcome = match.group(2).capitalize()
+                logs_list.append(
+                    {
+                        "timestamp": datetime.datetime.now().isoformat(
+                            timespec="seconds"
+                        ),
+                        "action": nodeid,
+                        "result": outcome,
+                        "duration": "-",
+                    }
+                )
+
+            # Update stats based on parsed fallback
+            if logs_list:
+                stats_obj["total"] = len(logs_list)
+                stats_obj["passed"] = len(
+                    [l for l in logs_list if l["result"] == "Passed"]
+                )
+                stats_obj["failed"] = stats_obj["total"] - stats_obj["passed"]
+
+        # If still empty create suite-level entry as last resort
+        if not logs_list:
+            logs_list.append(
+                {
+                    "timestamp": datetime.datetime.now().isoformat(timespec="seconds"),
+                    "action": "Test Suite",
+                    "result": ("Passed" if summary.get("failed", 0) == 0 else "Failed"),
+                    "duration": "0s",
+                }
+            )
+
+        return {
+            "report": report,
+            "healing_attempts": [],
+            "logs": logs_list,
+            "stats": stats_obj,
+            "final_stdout": result.stdout,
+            "final_stderr": result.stderr,
+        }
+
+
 if __name__ == "__main__":
     logger.info(
-        "Starting Flask development server", host="localhost", port=5000, debug=True
+        "Starting Flask development server with Dynamic Self-Healing Engine",
+        host="localhost",
+        port=5000,
+        debug=True,
     )
     app.run(debug=True, port=5000)

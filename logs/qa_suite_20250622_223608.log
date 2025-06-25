@@ -1,0 +1,5 @@
+2025-06-22 22:36:08 | INFO     | Frontend | info:76 | Starting QA-Suite Frontend | Context: {"streamlit_version": "1.24.0", "python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]"}
+2025-06-22 22:36:08 | INFO     | Frontend | info:76 | JS file uploaded and processed | Context: {"filename": "geneconnect 2 copy.js", "file_size": 4672, "content_length": 4672}
+2025-06-22 22:36:08 | INFO     | Frontend | info:76 | Making API call to generate script | Context: {"website_url": "123", "selected_tests_count": 20, "js_content_length": 4672}
+2025-06-22 22:37:09 | INFO     | Frontend | info:76 | Script generated successfully | Context: {"script_length": 14567, "response_time": 60.6691951751709}
+2025-06-22 22:37:09 | INFO     | Frontend | info:76 | Script generated and step advanced | Context: {"selected_tests_count": 20, "script_length": 14567}

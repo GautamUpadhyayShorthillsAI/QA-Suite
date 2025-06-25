@@ -1,0 +1,35 @@
+2025-06-23 16:58:37 | INFO     | Backend | info:76 | Starting QA-Suite Backend | Context: {"python_version": "3.12.3 (main, May 26 2025, 18:50:19) [GCC 13.3.0]", "flask_version": "2.3.3", "langchain_version": "0.1.53"}
+2025-06-23 16:58:37 | INFO     | Backend | info:76 | LLM initialized | Context: {"model": "gemini-2.5-flash-preview-05-20", "temperature": 0.2, "api_key_configured": true}
+2025-06-23 16:58:37 | INFO     | Backend | info:76 | Starting Flask development server | Context: {"host": "localhost", "port": 5000, "debug": true}
+2025-06-23 16:59:12 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 16:59:12 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Full Test Flow", "js_content_length": 10540, "has_js_content": true}
+2025-06-23 16:59:12 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
+2025-06-23 16:59:25 | INFO     | Backend | info:76 | LLM response received | Context: {"response_length": 2049, "llm_duration": 12.923307180404663}
+2025-06-23 16:59:25 | INFO     | Backend | info:76 | Test ideas generated successfully | Context: {"test_ideas_count": 20, "ideas_preview": ["Verify successful user login with valid credentials and accepted Terms & Conditions.", "Test login attempt with an empty company email field, expecting no navigation.", "Test login attempt with an empty password field, expecting no navigation."]}
+2025-06-23 16:59:25 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_test_ideas | Duration: 12.92s | Context: {"test_ideas_count": 20}
+2025-06-23 16:59:35 | INFO     | Backend | info:76 | Received full flow script generation request
+2025-06-23 16:59:35 | INFO     | Backend | info:76 | Processing full flow script generation request | Context: {"website_url": "https://valueinsightpro.jumpiq.com/auth/login", "js_content_length": 10540}
+2025-06-23 16:59:35 | INFO     | Backend | info:76 | Calling LLM for full flow script generation
+2025-06-23 17:00:15 | INFO     | Backend | info:76 | LLM response received for full flow script generation | Context: {"response_length": 15958, "llm_duration": 40.131011724472046}
+2025-06-23 17:00:15 | INFO     | Backend | info:76 | Full flow script validation passed | Context: {"script_length": 15944, "has_fixtures": true, "has_imports": true}
+2025-06-23 17:00:15 | INFO     | QA-Suite | performance:157 | PERFORMANCE generate_full_flow_script | Duration: 40.13s | Context: {"script_length": 15944}
+2025-06-23 17:00:18 | INFO     | Backend | info:76 | Received script execution request
+2025-06-23 17:00:18 | INFO     | Backend | info:76 | Processing script execution | Context: {"script_length": 15944, "script_preview": "import pytest\nimport re\nfrom playwright.sync_api import sync_playwright, expect\nfrom datetime import datetime\n\n@pytest.fixture(scope=\"session\")\ndef browser():\n    with sync_playwright() as p:\n        ", "has_js_context": false}
+2025-06-23 17:00:18 | INFO     | Backend | info:76 | Created temporary directory | Context: {"temp_dir": "/tmp/tmp9g34odir", "script_path": "/tmp/tmp9g34odir/test_script.py", "report_path": "/tmp/tmp9g34odir/report.json"}
+2025-06-23 17:00:18 | INFO     | Backend | info:76 | Starting execution attempt 1/3
+2025-06-23 17:00:18 | INFO     | Backend | info:76 | Enhancing test script with automatic DOM dumping on failure.
+2025-06-23 17:00:18 | INFO     | Backend | info:76 | Enhanced 1 test functions with error handling
+2025-06-23 17:00:18 | INFO     | QA-Suite | file_operation:143 | FILE write /tmp/tmp9g34odir/test_script.py | Status: SUCCESS | Context: {"content_length": 18446}
+2025-06-23 17:00:18 | INFO     | Backend | info:76 | Executing pytest command | Context: {"command": "pytest /tmp/tmp9g34odir/test_script.py --json-report --json-report-file=/tmp/tmp9g34odir/report.json --capture=no -v --tb=long --log-file=/tmp/tmp9g34odir/detailed_log.txt --log-file-level=DEBUG --log-cli-level=DEBUG", "working_dir": "/tmp/tmp9g34odir", "attempt": 1}
+2025-06-23 17:00:44 | INFO     | Backend | info:76 | Pytest execution completed | Context: {"return_code": 1, "execution_duration": 26.35881805419922, "stdout_length": 27503, "stderr_length": 0, "attempt": 1}
+2025-06-23 17:00:44 | WARNING  | Backend | warning:88 | Script failed on attempt 1. Analyzing for self-healing.
+2025-06-23 17:00:44 | INFO     | Backend | info:76 | Extracting failing command and context from traceback
+2025-06-23 17:00:44 | ERROR    | Backend | error:94 | Could not parse failing line from traceback
+2025-06-23 17:00:44 | ERROR    | Backend | error:94 | Could not parse failing line from traceback. Aborting self-heal.
+2025-06-23 17:00:44 | INFO     | QA-Suite | file_operation:143 | FILE read /tmp/tmp9g34odir/report.json | Status: SUCCESS
+2025-06-23 17:00:44 | INFO     | QA-Suite | test_result:135 | TEST test_script.py::test_complete_jumpiq_workflow | Result: failed
+2025-06-23 17:00:44 | INFO     | Backend | info:76 | Test execution results compiled | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1, "logs_count": 1, "detailed_failures_count": 1, "healing_attempts_count": 0}
+2025-06-23 17:00:44 | INFO     | QA-Suite | performance:157 | PERFORMANCE run_script | Duration: 26.36s | Context: {"total_tests": 1, "passed_tests": 0, "failed_tests": 1}
+2025-06-23 22:00:54 | INFO     | Backend | info:76 | Received test ideas generation request
+2025-06-23 22:00:54 | INFO     | Backend | info:76 | Processing test ideas request | Context: {"functionality": "Generate full flow", "js_content_length": 10540, "has_js_content": true}
+2025-06-23 22:00:54 | INFO     | Backend | info:76 | Calling LLM for test ideas generation
