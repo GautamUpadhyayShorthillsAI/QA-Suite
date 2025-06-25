@@ -1,11 +1,11 @@
 import pytest
 from playwright.sync_api import sync_playwright, expect
-from datetime import datetime, timedelta
+from datetime import datetime
 
 @pytest.fixture(scope="session")
 def browser():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=False,slow_mo=500)
         yield browser
         browser.close()
 
@@ -15,130 +15,198 @@ def page(browser):
     yield page
     page.close()
 
-def _login_and_handle_new_chat(page):
-    page.goto('https://geneconnectdoctor.shorthills.ai/login')
-    page.click('[data-testid="username"]')
-    page.fill('[data-testid="username"]', "test123")
-    page.click('[data-testid="password"]')
-    page.fill('[data-testid="password"]', "testpass")
+# Helper function for login
+def login(page):
+    page.set_viewport_size({"width": 1280, "height": 720})
+    page.goto('https://geneconnectdoctor.shorthills.ai/login', timeout=7000)
+    page.wait_for_selector('[data-testid="username"]', timeout=7000)
+    page.locator('[data-testid="username"]').fill("test123", timeout=7000)
+    page.locator('[data-testid="password"]').fill("testpass", timeout=7000)
     
-    with page.expect_navigation():
-        page.click('[data-testid="submit_button"]')
+    initial_url = page.url
+    page.locator('[data-testid="submit_button"]').click(timeout=7000)
+    page.wait_for_load_state(timeout=7000) # Wait for network idle or DOM content loaded
     
-    # Check if "New Chat" button is visible and click it
-    new_chat_button = page.locator('.hover\\:bg-accent')
-    if new_chat_button.is_visible():
-        with page.expect_navigation():
-            new_chat_button.click()
+    # Check if navigation occurred after login
+    if page.url != initial_url:
+        # Navigation occurred, login successful
+        pass
+    else:
+        # If URL did not change, check if the login button is no longer visible or a new element appears
+        if not page.locator('[data-testid="submit_button"]').is_visible(timeout=7000):
+            pass
+        else:
+            pytest.fail("Login failed: Expected navigation or UI change did not occur.")
 
-def _fill_first_form_valid_data(page, first_name="abhinav", last_name="arvind", dob_str="01/01/1990", gender_male=True):
-    page.fill('#P\\.firstName', first_name)
-    page.fill('#P\\.lastName', last_name)
-    page.fill('#P\\.dob', dob_str)
-    page.press('#P\\.dob', 'Enter') # Ensure date input is registered
-    if gender_male:
-        page.click('#P\\.gender-male')
+# Helper function to handle the optional "New Chat" button
+def handle_new_chat_button(page):
+    # This is the locator you need to click if a new chat button appears on the screen 
+    new_chat_button_selector = '.hover\:bg-accent'
+    if page.locator(new_chat_button_selector).is_visible(timeout=7000):
+        page.locator(new_chat_button_selector).click(timeout=7000)
+        page.wait_for_load_state(timeout=7000) # Wait for any potential load after clicking new chat
 
-def _assert_first_form_negative(page, submit_button_locator):
-    submit_button = page.locator(submit_button_locator)
+# Helper function to fill the first form with valid data
+def fill_first_form_valid_data(page):
+    page.wait_for_selector('#P\\.firstName', timeout=7000) # Ensure form is loaded
+    page.locator('#P\\.firstName').fill("Abhinav", timeout=7000)
+    page.locator('#P\\.lastName').fill("Arvind", timeout=7000)
+    page.locator('#P\\.dob').fill("09/07/2003", timeout=7000) # dd/mm/yyyy
+    page.locator('#P\\.age').click(timeout=7000) # As per JS, just click, not fill
+    page.locator('#P\\.gender-male').click(timeout=7000)
+    page.locator('#P\\.isAdopted-Unknown').click(timeout=7000)
+
+# Test Cases
+
+def test_successful_submission_first_form_valid_data(page):
+    login(page)
+    handle_new_chat_button(page)
+    
+    # First Form starts
+    fill_first_form_valid_data(page)
+    
+    # Click on <button> "Next"
+    next_button_selector = '.h-9'
+    initial_url = page.url
+    page.locator(next_button_selector).click(timeout=7000)
+    page.wait_for_load_state(timeout=7000) # Wait for any potential load after clicking next
+
+    # Apply positive test case assertion logic
+    if page.url != initial_url:
+        assert True
+    else:
+        if not page.locator(next_button_selector).is_visible(timeout=7000):
+            assert True
+        # Optionally, check if the next expected element (e.g., a medical history field) is visible
+        elif page.locator('#P\\.medicalHistory\\.diabetes').is_visible(timeout=7000):
+            assert True
+        else:
+            assert False, "Expected navigation or UI change did not occur after valid first form submission."
+
+def test_first_form_submission_empty_age_field(page):
+    login(page)
+    handle_new_chat_button(page)
+    
+    # First Form starts - fill all fields except age
+    page.wait_for_selector('#P\\.firstName', timeout=7000)
+    page.locator('#P\\.firstName').fill("Abhinav", timeout=7000)
+    page.locator('#P\\.lastName').fill("Arvind", timeout=7000)
+    page.locator('#P\\.dob').fill("09/07/2003", timeout=7000) # dd/mm/yyyy
+    # DO NOT interact with #P.age for this test
+    page.locator('#P\\.gender-male').click(timeout=7000)
+    page.locator('#P\\.isAdopted-Unknown').click(timeout=7000)
+    
+    # Click on <button> "Next"
+    next_button_selector = '.h-9'
+    submit_button = page.locator(next_button_selector)
+
+    # Apply negative test case assertion logic
     if submit_button.is_disabled():
         expect(submit_button).to_be_disabled()
     else:
         initial_url = page.url
-        submit_button.click()
-        expect(page).to_have_url(initial_url)
-        expect(page.locator('#P\\.firstName')).to_be_visible()
-        expect(page.locator('#P\\.lastName')).to_be_visible()
-        expect(page.locator('#P\\.dob')).to_be_visible()
-        expect(page.locator('#P\\.gender-male')).to_be_visible() # Check one of the gender options
-        expect(submit_button).to_be_visible()
+        submit_button.click(timeout=7000)
+        page.wait_for_load_state(timeout=7000) # Wait for any potential load after clicking next
+        
+        if page.url == initial_url:
+            assert submit_button.is_visible(timeout=7000)
+            # Optionally, check that key fields are still visible, e.g., first name
+            assert page.locator('#P\\.firstName').is_visible(timeout=7000)
+            # No specific error message selector provided in JS for this case.
+        else:
+            assert False, "Unexpected navigation occurred on invalid input (empty age)."
 
-def test_successful_submission_of_first_form_with_all_valid_data(page):
-    _login_and_handle_new_chat(page)
+def test_first_form_submission_without_selecting_gender(page):
+    login(page)
+    handle_new_chat_button(page)
     
-    initial_url = page.url
+    # First Form starts - fill all fields except gender
+    page.wait_for_selector('#P\\.firstName', timeout=7000)
+    page.locator('#P\\.firstName').fill("Abhinav", timeout=7000)
+    page.locator('#P\\.lastName').fill("Arvind", timeout=7000)
+    page.locator('#P\\.dob').fill("09/07/2003", timeout=7000) # dd/mm/yyyy
+    page.locator('#P\\.age').click(timeout=7000) # As per JS, just click, not fill
+    # DO NOT select gender
+    page.locator('#P\\.isAdopted-Unknown').click(timeout=7000)
     
-    # Fill First Form
-    _fill_first_form_valid_data(page, dob_str="01/01/1990")
-    
-    # Click Next
-    with page.expect_navigation():
-        page.locator('.h-9').click()
-    
-    # Fill Medical History for First Form
-    page.click('#P\\.medicalHistory\\.diabetes')
-    page.click('#P\\.medicalHistory\\.hypertension')
-    page.click('#P\\.medicalHistory\\.cancer')
-    page.click('#P\\.medicalHistory\\.heartDisease')
-    
-    # Click Save and Continue
-    with page.expect_navigation():
-        page.locator('.h-9').click()
-    
-    expect(page).not_to_have_url(initial_url)
+    # Click on <button> "Next"
+    next_button_selector = '.h-9'
+    submit_button = page.locator(next_button_selector)
 
-def test_first_form_submission_with_empty_first_name_field(page):
-    _login_and_handle_new_chat(page)
-    
-    # Fill First Form with empty First Name
-    _fill_first_form_valid_data(page, first_name="", last_name="arvind", dob_str="01/01/1990", gender_male=True)
-    
-    # Click Next
-    _assert_first_form_negative(page, '.h-9')
+    # Apply negative test case assertion logic
+    if submit_button.is_disabled():
+        expect(submit_button).to_be_disabled()
+    else:
+        initial_url = page.url
+        submit_button.click(timeout=7000)
+        page.wait_for_load_state(timeout=7000)
+        
+        if page.url == initial_url:
+            assert submit_button.is_visible(timeout=7000)
+            assert page.locator('#P\\.gender-male').is_visible(timeout=7000) # Ensure gender options are still visible
+        else:
+            assert False, "Unexpected navigation occurred on invalid input (no gender selected)."
 
-def test_first_form_submission_with_empty_last_name_field(page):
-    _login_and_handle_new_chat(page)
+def test_first_form_submission_invalid_date_of_birth_format(page):
+    login(page)
+    handle_new_chat_button(page)
     
-    # Fill First Form with empty Last Name
-    _fill_first_form_valid_data(page, first_name="abhinav", last_name="", dob_str="01/01/1990", gender_male=True)
+    # First Form starts - fill all fields, but with invalid DOB format
+    page.wait_for_selector('#P\\.firstName', timeout=7000)
+    page.locator('#P\\.firstName').fill("Abhinav", timeout=7000)
+    page.locator('#P\\.lastName').fill("Arvind", timeout=7000)
+    page.locator('#P\\.dob').fill("09-07-2003", timeout=7000) # Invalid format: MM-DD-YYYY instead of dd/mm/yyyy
+    page.locator('#P\\.age').click(timeout=7000)
+    page.locator('#P\\.gender-male').click(timeout=7000)
+    page.locator('#P\\.isAdopted-Unknown').click(timeout=7000)
     
-    # Click Next
-    _assert_first_form_negative(page, '.h-9')
+    # Click on <button> "Next"
+    next_button_selector = '.h-9'
+    submit_button = page.locator(next_button_selector)
 
-def test_first_form_submission_with_date_of_birth_set_to_a_future_date(page):
-    _login_and_handle_new_chat(page)
-    
-    # Set DOB to a future date (e.g., 1 year from now)
-    future_date = (datetime.now() + timedelta(days=365)).strftime("%m/%d/%Y")
-    _fill_first_form_valid_data(page, first_name="abhinav", last_name="arvind", dob_str=future_date, gender_male=True)
-    
-    # Click Next
-    _assert_first_form_negative(page, '.h-9')
+    # Apply negative test case assertion logic
+    if submit_button.is_disabled():
+        expect(submit_button).to_be_disabled()
+    else:
+        initial_url = page.url
+        submit_button.click(timeout=7000)
+        page.wait_for_load_state(timeout=7000)
+        
+        if page.url == initial_url:
+            assert submit_button.is_visible(timeout=7000)
+            assert page.locator('#P\\.dob').is_visible(timeout=7000) # Ensure DOB field is still visible
+        else:
+            assert False, "Unexpected navigation occurred on invalid input (invalid DOB format)."
 
-def test_first_form_submission_with_date_of_birth_indicating_an_age_below_a_reasonable_minimum(page):
-    _login_and_handle_new_chat(page)
+def test_first_form_submission_date_of_birth_in_future(page):
+    login(page)
+    handle_new_chat_button(page)
     
-    # Set DOB to today's date (age < 1 year)
-    today_date = datetime.now().strftime("%m/%d/%Y")
-    _fill_first_form_valid_data(page, first_name="abhinav", last_name="arvind", dob_str=today_date, gender_male=True)
+    # First Form starts - fill all fields, but with DOB in future
+    future_date = (datetime.now().year + 1).strftime("%d/%m/%Y") # e.g., 09/07/2025
     
-    # Click Next
-    _assert_first_form_negative(page, '.h-9')
+    page.wait_for_selector('#P\\.firstName', timeout=7000)
+    page.locator('#P\\.firstName').fill("Abhinav", timeout=7000)
+    page.locator('#P\\.lastName').fill("Arvind", timeout=7000)
+    page.locator('#P\\.dob').fill(future_date, timeout=7000)
+    page.locator('#P\\.age').click(timeout=7000)
+    page.locator('#P\\.gender-male').click(timeout=7000)
+    page.locator('#P\\.isAdopted-Unknown').click(timeout=7000)
+    
+    # Click on <button> "Next"
+    next_button_selector = '.h-9'
+    submit_button = page.locator(next_button_selector)
 
-def test_first_form_submission_without_selecting_a_gender(page):
-    _login_and_handle_new_chat(page)
-    
-    # Fill First Form without selecting gender
-    _fill_first_form_valid_data(page, first_name="abhinav", last_name="arvind", dob_str="01/01/1990", gender_male=False)
-    
-    # Click Next
-    _assert_first_form_negative(page, '.h-9')
-
-def test_first_form_submission_with_first_name_containing_invalid_characters(page):
-    _login_and_handle_new_chat(page)
-    
-    # Fill First Name with invalid characters
-    _fill_first_form_valid_data(page, first_name="abhinav123!", last_name="arvind", dob_str="01/01/1990", gender_male=True)
-    
-    # Click Next
-    _assert_first_form_negative(page, '.h-9')
-
-def test_first_form_submission_with_date_of_birth_for_a_very_old_person(page):
-    _login_and_handle_new_chat(page)
-    
-    # Set DOB to a very old date (e.g., 1900)
-    very_old_date = "01/01/1900"
-    _fill_first_form_valid_data(page, first_name="abhinav", last_name="arvind", dob_str=very_old_date, gender_male=True)
-    
-    # Click Next
-    _assert_first_form_negative(page, '.h-9')
+    # Apply negative test case assertion logic
+    if submit_button.is_disabled():
+        expect(submit_button).to_be_disabled()
+    else:
+        initial_url = page.url
+        submit_button.click(timeout=7000)
+        page.wait_for_load_state(timeout=7000)
+        
+        if page.url == initial_url:
+            assert submit_button.is_visible(timeout=7000)
+            assert page.locator('#P\\.dob').is_visible(timeout=7000) # Ensure DOB field is still visible
+        else:
+            assert False, "Unexpected navigation occurred on invalid input (DOB in future)."

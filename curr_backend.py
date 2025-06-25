@@ -31,7 +31,7 @@ def generate_test_ideas():
     functionality = data.get("functionality", "")
 
     prompt = f"""
-You are a world-class Senior QA Automation Engineer. Your task is to analyze a recorded user session (Playwright JS file) and a desired functionality to test, and then create a comprehensive list of test case ideas.
+You are a world-class Senior QA Automation Engineer. Your task is to analyze a recorded user session (Playwright JS file) and a desired functionality to test, and then create a comprehensive list of test case ideas pay attention to the JS file comments and understand if sections are present .
 
 **CONTEXT:**
 - **User Journey (from JS File):** I will provide a sequence of actions a user took on a website (e.g., Login -> Fill Form 1 -> Fill Form 2 -> Logout).
@@ -76,7 +76,29 @@ Return ONLY a JSON object like this. Do not include any other text, markdown, or
     {js_file_content}
     ```
 
-Generate up to 15 relevant test case titles based on these instructions.
+**Additional Instructions:**
+1. *Whole-Flow Mode*  
+   • If the user request explicitly contains keywords like **"whole flow", "entire web-flow", "all sections", "complete sanity", "sanity testing"** or if *no functionality* is provided, assume they want to test every section of the journey.  
+   • Break the journey into logical sections by reading the JS file **comments** (e.g., `// Login`, `// Form-1`).  
+   • Generate **up to 5** creative test-idea titles for **each incremental slice** of the flow.  Using `Login → Form-1 → Form-2` as an example you must return:  
+       – 5 ideas that validate *Login* alone.  
+       – 5 ideas for *Login then Form-1*.  
+       – 5 ideas for *Login then Form-1 then Form-2*.  
+   • Make sure the titles make it obvious which slice they belong to (e.g., "[Login Only] ...").
+
+2. *Verbatim-Flow / Sanity Mode*  
+   • If the user says **"convert JS to pytest", "run recorded flow", "one sanity test", "complete sanity", "sanity testing"** or similar, return **exactly one** idea: `"Execute the recorded flow end-to-end without deviations"`.
+
+3. *Focused Functionality Mode* (default)  
+   • If a specific functionality string is supplied (e.g., "Signup"), generate ideas **only for that section**, treating all preceding steps in the JS file as *setup*.
+
+4. *Edge-Case Comments*  
+   • Sometimes comments mention optional UI elements (e.g., a floating chat widget after login).  If such an element appears **it should merely be clicked/closed and the flow must continue**; do not turn it into a separate test idea.
+
+5. *Negative Test Case Isolation*  
+   • For negative test ideas involving a specific field (e.g., "empty age", "invalid email"), assume all other fields are filled with valid data as per the JS file. Do not suggest test ideas where multiple fields are invalid at once unless that is a realistic user scenario.
+
+Always respect the recorded selectors and never invent URLs or error messages.
 """
 
     try:
@@ -91,87 +113,180 @@ Generate up to 15 relevant test case titles based on these instructions.
     except Exception as e:
         return jsonify({"error": f"Failed to parse test ideas: {str(e)}"}), 500
 
+@app.route("/guidelines", methods=["GET"])
+def get_guidelines():
+    guidelines = """
+# QA Suite Prompting & Usage Guidelines
+
+## How to Use This Tool
+
+1. **Test a single functionality**
+   - Type its name (e.g., `Login`, `Search`, `Checkout`).
+   - You will get test ideas for that part only.
+
+2. **Test the *whole* web-flow**
+   - Enter `whole flow`, `entire web-flow`, `all sections`, `complete sanity`, or `sanity testing`.
+   - You will get incremental test ideas for every section (e.g., *Login only*, *Login → Form-1*, etc.).
+
+3. **Run the recorded JS exactly once**
+   - Enter `verbatim flow`, `sanity`, `convert`, `run recorded flow`, or `one sanity test`.
+   - You will get a single pytest that mirrors the JS events step-by-step.
+
+## Best Practices for Prompting
+
+- Be specific about the functionality you want to test.
+- For negative test cases, the system will assume all other fields are valid unless you specify otherwise.
+- If you want to test the entire journey, use the keywords above.
+- If you want to test only the recorded flow, use the verbatim/sanity keywords.
+
+## Assertion & Logging Rules
+
+- For positive cases, the script will check for unique elements or text on the next page/section after navigation.
+- For negative cases, after a failed submission, the script will check:
+  - If the submit button is disabled
+  - If the URL did not change
+  - If the form or a key field is still visible
+  - If an error message or unique heading/text is present (if selector is known)
+- Assertion errors and reasons for failure will be logged and shown in the results.
+
+---
+"""
+    return guidelines, 200, {"Content-Type": "text/markdown"}
+
 @app.route("/generate_script", methods=["POST"])
 def generate_script():
     data = request.get_json()
     js_file_content = data.get("js_file_content", "")
     selected_tests = data.get("selected_tests", [])
     website_url = data.get("website_url", "")
+    test_ideas = data.get("test_ideas", [])
 
-    prompt = f"""
-You are a senior QA automation engineer. Generate a Playwright Python pytest script with the following STRICT requirements:
+    prompt = """
+            You are a senior QA automation engineer. Generate a Playwright Python pytest script with the following STRICT requirements. Pay attention to the JS file comments and use them to handle edge cases. Make dedicated pytest functions to ensure a smooth flow of the test cases.
 
 1. **Imports and Fixtures:**  
    Use these imports and fixtures exactly:
-   import pytest
-   from playwright.sync_api import sync_playwright, expect
-   from datetime import datetime
+import pytest
+from playwright.sync_api import sync_playwright, expect
+from datetime import datetime
 
-   @pytest.fixture(scope="session")
-   def browser():
-       with sync_playwright() as p:
-           browser = p.chromium.launch(headless=False)
-           yield browser
-           browser.close()
+@pytest.fixture(scope="session")
+def browser():
+    with sync_playwright() as p:
+           browser = p.chromium.launch(headless=False,slow_mo=500)
+        yield browser
+        browser.close()
 
-   @pytest.fixture
-   def page(browser):
-       page = browser.new_page()
-       yield page
-       page.close()
+@pytest.fixture
+def page(browser):
+    page = browser.new_page()
+    yield page
+    page.close()
 
 2. **Test Structure:**  
    - Each test function (`def test_...`) must be fully self-contained.  
    - Each test must start from `page.goto({website_url})` and perform all necessary steps (login, navigation, etc.) to reach the target functionality, using the actions and locators from the provided JS file.
    - Do not share state between tests.
 
+**CRITICAL PLAYWRIGHT SYNTAX:** 
+   - Viewport: `page.set_viewport_size({{"width": 1280, "height": 720}})` NOT `page.set_viewport_size(width=1280, height=720)`
+   - Wait for element: `page.wait_for_selector("selector")` NOT `page.wait_for_element("selector")`
+   - Fill input: `page.locator("input").fill("text")` NOT `page.locator("input").type("text")`
+   - Click and wait: `page.locator("button").click()` then `page.wait_for_load_state()`
+
 3. **Test Logic:**  
    - For **positive** test cases:  
-     - After the final action, assert that the URL has changed (i.e., navigation occurred) using:
-       initial_url = page.url
-       # ... perform actions ...
-       with page.expect_navigation():
-           page.locator(...).click()
-       expect(page).not_to_have_url(initial_url)
+     - After the final action, perform the following checks in order:
+       1. Save the initial URL before the action: `initial_url = page.url`
+       2. Perform the final action (e.g., click submit/login/next).
+       3. If you are certain from the JS file that navigation occurs, you may use `with page.expect_navigation(): ...` for that action. Otherwise, just click.
+       4. After the action, check if the URL has changed:
+          ```python
+          if page.url != initial_url:
+              # Navigation occurred, test passes
+              assert True
+          else:
+              # If the URL did not change, check if the current form/button is no longer visible (i.e., the UI changed)
+              if not page.locator("<current-form-or-button-selector>").is_visible():
+                  assert True
+              # Optionally, check if the next expected element is visible (if present in the JS file)
+              elif page.locator("<next-expected-element-selector>").is_visible():
+                  assert True
+              # Optionally, check for unique text content or heading on the next page
+              elif "<expected-text-on-next-page>" in (page.locator("body").text_content() or ""):
+                  assert True
+              else:
+                  assert False, "Expected navigation or UI change did not occur."
+          ```
+     - Do **not** assert that previous form fields/buttons are still visible after a successful action.
+
    - For **negative** login or form test cases (e.g., invalid form submission, invalid login):  
      - First, check if the submit/next/login button is disabled:
+```python
        submit_button = page.locator("...")
        if submit_button.is_disabled():
            expect(submit_button).to_be_disabled()
        else:
-           # After clicking, check that the DOM of the relevant form has not changed:
-           form = page.locator('form-selector')  # Use the actual form selector from the JS file
-           before = form.inner_html()
+           initial_url = page.url
            submit_button.click()
-           after = form.inner_html()
-           assert before == after
+           # After clicking, check that the URL did not change:
+           if page.url == initial_url:
+               # Check that the form/button is still visible
+               assert submit_button.is_visible()
+               # Optionally, check that the key field(s) are still visible
+               # Optionally, check for a form heading or unique text content
+               # Only if an error message selector is present in the JS file, check that it is visible and contains relevant text
+               # Example:
+               # if page.locator(".error-message").is_visible():
+               #     error_text = page.locator(".error-message").text_content() or ""
+               #     assert "required" in error_text or "invalid" in error_text
+           else:
+               assert False, "Unexpected navigation occurred on invalid input."
+       ```
      - Do **not** use `expect()` on strings or HTML content.
-     - Do **not** check for specific error messages or invent selectors.
+     - Do **not** check for specific error messages or invent selectors. Only check for error messages if a selector/class is provided in the JS file.
+     - Do **not** perform full DOM string comparisons.
      - Use only locators and actions present in the JS file.
-   - **For form-related negative test cases (e.g., 'don't fill age and test submit')**: All other fields in the form should be filled with valid data as per the JS file, except the one being tested for negative behavior. This ensures the test is consistent and only the intended field is left empty or invalid.
-   - **For dropdowns:** Select a valid option for positive tests, and for negative tests, try not selecting any option or selecting an invalid option if possible.
-   - **For checkboxes/radio buttons:** For positive tests, check the required boxes; for negative, leave them unchecked or select conflicting options if applicable.
-   - **For file uploads:** For positive, upload a valid file; for negative, try uploading an invalid file type or leave it empty.
-   - **For search or filter functionalities:** For positive, enter a valid search term and assert results appear; for negative, enter an invalid or empty term and assert no results or an appropriate message.
-   - **For navigation or multi-step forms:** Always follow the correct flow as per the JS file to reach the target step, and for each test, only alter the specific field or action under test.
 
-4. **Test Naming:**  
-   - Name each test function clearly based on the test case description.
+   - **For form-related negative test cases:**
+     - When testing a negative scenario for a specific field (e.g., "age" is invalid), all other fields in the form must be filled with valid data as per the JS file. Only the field under test should be invalid or empty. Do not create negative tests where multiple fields are invalid unless that is a realistic user scenario.
 
-5. **No Markdown or Explanations:**  
-   - Output only the raw Python code, no markdown fences or extra text.
+   - **For dropdowns, checkboxes, file uploads, search/filter, navigation, etc.:** (as previously described...)
 
-6. **Inputs:**  
+4. **Whole-Flow Testing (Incremental):**  
+   - When the user requests keywords like *"whole flow"*, *"entire web-flow"*, *"all sections"*, *"complete sanity"*, *"sanity testing"*, or leaves the functionality blank, break the JS journey into clearly marked **sections** using its comments.  
+   - Produce incremental tests: e.g., `Login only`, `Login + Form-1`, `Login + Form-1 + Form-2`, each set containing up to **5 tests**.  
+   - Re-use the same **setup code** for the prerequisite steps so that each test starts from the home page and reaches the required slice.
+
+5. **Verbatim-Flow / Sanity Test (Single):** 
+   - When the user says *"convert JS to pytest"*, *"run recorded JS flow"*, *"sanity"*, *"one sanity test"*, *"complete sanity"*, *"sanity testing"*, etc., create **exactly one** test function that reproduces the recorded JS actions **verbatim** (step-by-step, using only the actions and selectors from the JS file). Do **not** add intermediate assertions. Only add a single assertion at the end of the test, such as checking the final URL or that a final element (present at the end of the JS flow) is visible. Do not invent selectors or error messages.
+
+6. **Edge-Case Elements:**  
+   - If optional/pop-up UI elements (e.g., chat widgets) appear as indicated by JS comments, handle them gracefully (`if page.locator("text=Chat").is_visible(): ...`) but **do not** assert their presence or fail because of them.
+
+7. **Test Naming:**  
+    - Name each test function clearly based on the test case description.
+
+8. **No Markdown or Explanations:**  
+    - Output only the raw Python code, no markdown fences or extra text.
+
+9. **Inputs:**  
    - Website URL: {website_url}
    - JS file actions (for setup and locators):  
-     ```javascript
-     {js_file_content}
-     ```
+```javascript
+{js_file_content}
+```
    - Test cases to generate:  
-     {selected_tests}
+{selected_tests}
+   - User request: {test_ideas}
 
 Follow these rules strictly. Do not invent selectors, URLs, or error messages. Use only what is present in the JS file and the test case descriptions.
-"""
+""".format(
+        website_url=website_url,
+        js_file_content=js_file_content,
+        selected_tests=selected_tests,
+        test_ideas=test_ideas
+    )
 
     try:
         response = llm.invoke(prompt)
@@ -227,21 +342,41 @@ def run_script():
                 report = json.load(f)
 
             logs = []
+            passed = failed = 0
+
             for test in report.get("tests", []):
+                outcome = test.get("outcome", "error")
+                reason = "Test passed successfully." if outcome == "passed" else str(test.get("longrepr", ""))
+
                 logs.append({
                     "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "action": test.get("nodeid", "Unknown Test"),
-                    "result": test.get("outcome", "error").capitalize()
+                    "result": outcome.capitalize(),
+                    "reason": reason
                 })
-                # Add individual test steps if available
+
+                if outcome == "passed":
+                    passed += 1
+                else:
+                    failed += 1
+
+                # Optional: detailed step trace (does not affect stats)
                 for call in test.get("call", {}).get("trace", {}).get("steps", []):
                     logs.append({
                         "timestamp": datetime.datetime.fromtimestamp(call["start"]).strftime("%Y-%m-%d %H:%M:%S"),
                         "action": call["name"],
-                        "result": "Pass" if call["status"] == "passed" else "Fail"
+                        "result": "Pass" if call["status"] == "passed" else "Fail",
+                        "reason": ""
                     })
 
-            return jsonify({"logs": logs})
+            return jsonify({
+                "logs": logs,
+                "stats": {
+                    "passed": passed,
+                    "failed": failed,
+                    "total": passed + failed
+                }
+            })
 
         except Exception as e:
             return jsonify({
