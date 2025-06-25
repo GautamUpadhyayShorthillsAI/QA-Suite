@@ -8,6 +8,17 @@ import json
 import datetime
 import re
 
+import logging
+# ──────────────────────────────────────────
+# one-time logger setup – put near top-of-file
+logging.basicConfig(
+    filename="test_runner.log",           # <— central log file
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+logger = logging.getLogger(__name__)
+# ─────────────────
+
 load_dotenv()
 
 llm = ChatGoogleGenerativeAI(
@@ -38,7 +49,7 @@ You are a world-class Senior QA Automation Engineer. Your task is to analyze a r
 - **Functionality to Test:** The user will specify a part of that journey they want to test thoroughly (e.g., "Form 1").
 
 **YOUR TASK:**
-1.  **Understand the Test Flow:** Your primary goal is to generate test cases for the *specific functionality* requested.
+1.  **Understand the Test Flow:** Your primary goal is to generate as many logical, non overlapping test cases for the *specific functionality* requested.
 2.  **Isolate the Target:** Treat all steps in the JS file *before* the target functionality as a necessary "setup." For example, if the user wants to test "Form 1", the "Login" part of the JS file is the setup. You do not need to generate test cases for the setup itself.
 3.  **Generate Specific & Creative Test Ideas:** For the specified functionality, generate a list of both positive and negative test case titles. These should be creative and cover common edge cases.
 
@@ -110,7 +121,7 @@ Always respect the recorded selectors and never invent URLs or error messages.
         json_str = response.content[json_start:json_end]
         
         test_ideas = json.loads(json_str).get("test_ideas", [])
-        return jsonify({"test_ideas": test_ideas[:15]})
+        return jsonify({"test_ideas": test_ideas})
     except Exception as e:
         return jsonify({"error": f"Failed to parse test ideas: {str(e)}"}), 500
 
@@ -247,84 +258,190 @@ Follow these rules strictly. Do not invent selectors, URLs, or error messages. U
         return jsonify({"error": str(e)}), 500
     
 
+# @app.route("/run_script", methods=["POST"])
+# def run_script():
+#     data = request.get_json()
+#     script_content = data.get("script_content", "")
+
+#     with tempfile.TemporaryDirectory() as temp_dir:
+#         script_path = os.path.join(temp_dir, "test_script.py")
+#         report_path = os.path.join(temp_dir, "report.json")
+
+#         with open(script_path, "w") as f:
+#             f.write(script_content)
+
+#         try:
+#             # Run pytest with json reporting
+#             cmd = [
+#                 "pytest", 
+#                 script_path,
+#                 "--json-report",
+#                 f"--json-report-file={report_path}",
+#                 "--capture=no"
+#             ]
+#             subprocess.run(cmd, check=False, cwd=temp_dir, capture_output=True, text=True)
+
+#             # Parse and format results for frontend
+#             if not os.path.exists(report_path):
+#                 return jsonify({
+#                     "error": "Test execution failed",
+#                     "details": "No report generated - possible syntax error"
+#                 }), 400
+
+#             with open(report_path) as f:
+#                 report = json.load(f)
+
+#             logs = []
+#             passed = failed = 0
+
+#             for test in report.get("tests", []):
+#                 outcome = test.get("outcome", "error")
+#                 if outcome == "passed":
+#                     reason = "Test passed successfully."
+#                 else:
+#                     # Extract failure reason from 'longrepr'
+#                     longrepr = test.get("longrepr", "")
+#                     if isinstance(longrepr, dict):
+#                         # Try multiple nested fields
+#                         reason = (
+#                             longrepr.get("reprcrash", {}).get("message")
+#                             or longrepr.get("message")
+#                             or longrepr.get("reprtraceback", {}).get("entries", [{}])[-1].get("line")
+#                             or json.dumps(longrepr)
+#                         )
+#                     else:
+#                         reason = str(longrepr) if longrepr else "Unknown error"
+#                 logs.append({
+#                     "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+#                     "action": test.get("nodeid", "Unknown Test"),
+#                     "result": outcome.capitalize(),
+#                     "reason": reason
+#                 })
+
+#                 if outcome == "passed":
+#                     passed += 1
+#                 else:
+#                     failed += 1
+
+#                 # Optional: detailed step trace (does not affect stats)
+#                 for call in test.get("call", {}).get("trace", {}).get("steps", []):
+#                     logs.append({
+#                         "timestamp": datetime.datetime.fromtimestamp(call["start"]).strftime("%Y-%m-%d %H:%M:%S"),
+#                         "action": call["name"],
+#                         "result": "Pass" if call["status"] == "passed" else "Fail",
+#                         "reason": ""
+#                     })
+
+#             return jsonify({
+#                 "logs": logs,
+#                 "stats": {
+#                     "passed": passed,
+#                     "failed": failed,
+#                     "total": passed + failed
+#                 }
+#             })
+
+#         except Exception as e:
+#             return jsonify({
+#                 "error": "Test execution failed",
+#                 "details": str(e)
+#             }), 500
+    
+
 @app.route("/run_script", methods=["POST"])
 def run_script():
     data = request.get_json()
-    script_content = data.get("script_content", "")
+    script_content = data.get("script_content", "").strip()
+
+    if not script_content:
+        return jsonify({"error": "Empty script_content"}), 400
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        script_path = os.path.join(temp_dir, "test_script.py")
-        report_path = os.path.join(temp_dir, "report.json")
+        script_path  = os.path.join(temp_dir, "test_script.py")
+        report_path  = os.path.join(temp_dir, "report.json")
 
+        # write the script to disk
         with open(script_path, "w") as f:
             f.write(script_content)
 
-        try:
-            # Run pytest with json reporting
-            cmd = [
-                "pytest", 
-                script_path,
-                "--json-report",
-                f"--json-report-file={report_path}",
-                "--capture=no"
-            ]
-            subprocess.run(cmd, check=False, cwd=temp_dir, capture_output=True, text=True)
+        # ── run pytest and capture *all* terminal output ────────────────────────
+        cmd = [
+            "pytest",
+            script_path,
+            "--json-report",
+            f"--json-report-file={report_path}",
+            "--capture=no",
+        ]
+        result = subprocess.run(
+            cmd,
+            cwd=temp_dir,
+            text=True,
+            capture_output=True,   # stdout+stderr captured here
+        )
 
-            # Parse and format results for frontend
-            if not os.path.exists(report_path):
-                return jsonify({
-                    "error": "Test execution failed",
-                    "details": "No report generated - possible syntax error"
-                }), 400
+        # always log raw terminal output
+        logger.info("[pytest stdout]\n%s", result.stdout.strip())
+        logger.info("[pytest stderr]\n%s", result.stderr.strip())
 
-            with open(report_path) as f:
-                report = json.load(f)
+        # decide up-front whether something failed
+        pytest_failed = result.returncode != 0
+        json_report_missing = not os.path.exists(report_path)
 
-            logs = []
-            passed = failed = 0
+        # if *anything* failed, dump the generated script for later debugging
+        if pytest_failed or json_report_missing:
+            logger.error("[generated test_script.py]\n%s", script_content)
 
-            for test in report.get("tests", []):
-                outcome = test.get("outcome", "error")
-                reason = "Test passed successfully." if outcome == "passed" else str(test.get("longrepr", ""))
-
-                logs.append({
-                    "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "action": test.get("nodeid", "Unknown Test"),
-                    "result": outcome.capitalize(),
-                    "reason": reason
-                })
-
-                if outcome == "passed":
-                    passed += 1
-                else:
-                    failed += 1
-
-                # Optional: detailed step trace (does not affect stats)
-                for call in test.get("call", {}).get("trace", {}).get("steps", []):
-                    logs.append({
-                        "timestamp": datetime.datetime.fromtimestamp(call["start"]).strftime("%Y-%m-%d %H:%M:%S"),
-                        "action": call["name"],
-                        "result": "Pass" if call["status"] == "passed" else "Fail",
-                        "reason": ""
-                    })
-
-            return jsonify({
-                "logs": logs,
-                "stats": {
-                    "passed": passed,
-                    "failed": failed,
-                    "total": passed + failed
-                }
-            })
-
-        except Exception as e:
+        # ── graceful HTTP responses ───────────────────────────────────────────
+        if json_report_missing:
             return jsonify({
                 "error": "Test execution failed",
-                "details": str(e)
+                "details": "No JSON report generated – check logs for full traceback"
             }), 500
-    
 
+        # normal happy-path: parse report, build stats
+        with open(report_path) as f:
+            report = json.load(f)
 
+        logs   = []
+        passed = failed = 0
+
+        for test in report.get("tests", []):
+            outcome  = test.get("outcome", "error")
+            nodeid   = test.get("nodeid", "Unknown Test")
+            longrepr = test.get("longrepr", "")
+            reason   = "Test passed successfully."
+
+            if outcome != "passed":
+                failed += 1
+                # human-readable failure reason
+                if isinstance(longrepr, dict):
+                    reason = (
+                        longrepr.get("reprcrash", {}).get("message")
+                        or longrepr.get("message")
+                        or json.dumps(longrepr)[:300]  # trim if massive
+                    )
+                else:
+                    reason = str(longrepr)[:300]
+            else:
+                passed += 1
+
+            logs.append({
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "action": nodeid,
+                "result": outcome.capitalize(),
+                "reason": reason,
+            })
+
+        return jsonify({
+            "logs": logs,
+            "stats": {
+                "passed": passed,
+                "failed": failed,
+                "total": passed + failed,
+            },
+            # optional: echo temp_dir for inspection in dev mode
+            # "tmp": temp_dir
+        })
 
 
 
