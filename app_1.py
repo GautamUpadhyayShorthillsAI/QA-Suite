@@ -27,9 +27,24 @@ with st.sidebar:
     st.subheader("💡 Prompting Guide")
     st.markdown("""
     • **Test a single functionality** – type its name (e.g., `Login`, `Search`, `Checkout`).\n 
-    • **Test the *whole* web-flow** – enter **`whole flow`** or leave the functionality blank. You will receive incremental test ideas for every section (e.g., *Login only*, *Login → Form-1*, etc.)\n.
+    • **Test the *whole* web-flow** – enter **`whole flow`**, **`complete sanity`**, **`sanity testing`** or leave the functionality blank. You will receive incremental test ideas for every section (e.g., *Login only*, *Login → Form-1*, etc.)\n.
     • **Run the recorded JS exactly once** – enter **`verbatim flow`** / **`sanity`** / **`convert`** to get a single pytest that mirrors the JS events step-by-step.
     """)
+
+    st.markdown("---")
+    if st.button("📖 Guidelines & Best Practices"):
+        with st.spinner("Fetching guidelines..."):
+            try:
+                resp = requests.get("http://localhost:5000/guidelines")
+                if resp.status_code == 200:
+                    st.markdown(resp.text, unsafe_allow_html=True)
+                else:
+                    st.error("Failed to fetch guidelines.")
+            except Exception as e:
+                st.error(f"Error fetching guidelines: {e}")
+
+    st.markdown("---")
+    st.info("⏱️ All waits/selectors in generated scripts use a reduced timeout (7 seconds) for faster feedback on failures.")
 
 # Backend endpoints
 BACKEND_URL = "http://localhost:5000"
