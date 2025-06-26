@@ -113,6 +113,8 @@ if st.session_state.current_step >= 2:
             st.session_state.test_ideas = generate_test_ideas(js_file_content, functionality)
         if st.session_state.test_ideas:
             st.session_state.current_step = max(st.session_state.current_step, 3)
+            st.info(f"Generated {len(st.session_state.test_ideas)}")
+            st.metric("Test ideas generated",len(st.session_state.test_ideas))
 
 # Step 4: Select Tests & Generate Script
 if st.session_state.current_step >= 3 and st.session_state.test_ideas:
