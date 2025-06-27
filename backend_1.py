@@ -49,10 +49,10 @@ You are a world-class Senior QA Automation Engineer. Your task is to analyze a r
 - **Functionality to Test:** The user will specify a part of that journey they want to test thoroughly (e.g., "Form 1").
 
 **YOUR TASK:**
-1.  **Understand the Test Flow:** Your primary goal is to generate as many logical, non overlapping test cases for the *specific functionality* requested.
+1.  **Understand the Test Flow:** Your primary goal is to generate as many logical and non-overlapping test cases for the *specific functionality* requested.
 2.  **Isolate the Target:** Treat all steps in the JS file *before* the target functionality as a necessary "setup." For example, if the user wants to test "Form 1", the "Login" part of the JS file is the setup. You do not need to generate test cases for the setup itself.
 3.  **Generate Specific & Creative Test Ideas:** For the specified functionality, generate a list of both positive and negative test case titles. These should be creative and cover common edge cases.
-
+4.  **If the number of test cases is mentioned in the prompt then generate that exact amount of test cases**
 **STRICT OUTPUT FORMAT:**
 Return ONLY a JSON object like this. Do not include any other text, markdown, or explanations.
 {{
@@ -240,6 +240,7 @@ Follow these rules strictly. Do not invent selectors, URLs, or error messages. U
 
     try:
         response = llm.invoke(prompt)
+
         script = clean_llm_output(response.content)
         # Loosened validation: only require fixtures and imports
         required = [

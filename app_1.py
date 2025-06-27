@@ -122,7 +122,7 @@ if st.session_state.current_step >= 3 and st.session_state.test_ideas:
     st.subheader("🧪 Select Tests & Generate Script")
     selected_tests = []
     for idea in st.session_state.test_ideas:
-        if st.checkbox(idea, value=True):
+        if st.checkbox(idea, value=True,key=f"check_box_{idea}"):
             selected_tests.append(idea)
     
     if st.button("🚀 Generate Script for Selected Tests"):
@@ -141,8 +141,7 @@ if st.session_state.current_step >= 4 and st.session_state.generated_script:
         st.success("Script saved!")
     script_to_run = st.session_state.get("final_script", edited_script)
     st.session_state.current_step = max(st.session_state.current_step, 5)
-
-# Step 6: Run Test Cases
+# Step 6: Run Test Cases 
 if st.session_state.current_step >= 5:
     st.markdown("---")
     st.subheader("▶️ Run Test Cases & View Logs")
